@@ -35,7 +35,7 @@
 
         header {
             margin-bottom: 15px;
-            border-bottom: 2px solid var(--burgundy);
+            border-bottom: none;
             padding-bottom: 10px;
         }
 
@@ -79,7 +79,29 @@
         }
         .wine-input:focus { border-color: var(--burgundy); outline: none; }
 
-        .section-header { font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #a0aec0; border-bottom: 1px solid #edf2f7; margin: 20px 0 8px 0; }
+        /* AI NOTE BOX */
+.ai-note-box {
+    background: transparent;  /* No background color */
+    border: none;             /* No frame/border */
+    padding: 10px 0;          /* Just vertical spacing */
+    margin-top: 5px;
+    font-size: 0.85rem;        /* Normal readable size */
+    color: #2d3748;           /* Dark grey text */
+    line-height: 1.2;
+    display: none;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.ai-note-box.visible { 
+    display: block; 
+}
+
+/* Hide the label completely per instructions */
+.ai-label { 
+    display: none; 
+}
+
+        .section-header { font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #a0aec0; border-bottom: 1px solid #edf2f7; margin: 10px 0 8px 0; }
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
         @media (max-width: 700px) { .grid-3 { grid-template-columns: 1fr; } }
         .col { padding: 8px; border-radius: 6px; display: flex; flex-direction: column; gap: 6px; border-width: 1px; border-style: solid; }
@@ -122,9 +144,16 @@
             <button class="btn-add-sheet" onclick="createNewSheet()">+</button>
         </div>
         <input type="text" id="wineRef" class="wine-input" placeholder="Wine Name / Reference">
+        
+        <!-- AI NOTE DISPLAY -->
+        <div id="aiNoteBox" class="ai-note-box">
+            <span class="ai-label">AI Tasting Note</span>
+            <div id="aiNoteText">Generating...</div>
+        </div>
+
     </header>
 
-    <!-- NOSE -->
+<!-- NOSE -->
     <div class="section-header">Nose</div>
     <div class="grid-3">
         <div class="col col-flaws">
@@ -159,7 +188,7 @@
         <div class="col col-traits">
             <div class="col-title">Traits</div>
             <label><input type="checkbox" name="palate_traits" value="Stemmy/Vegetal"> Stemmy / Vegetal (full bunch)</label>
-            <label><input type="checkbox" name="palate_traits" value="Tightly wound"> Tightly wound</label>
+            <label><input type="checkbox" name="palate_traits" value="Tightly wound"> Tightly Wound</label>
             <label><input type="checkbox" name="palate_traits" value="Transparent/Ethereal"> Transparent / Ethereal</label>
         </div>
         <div class="col col-pros">
@@ -181,8 +210,8 @@
         </div>
         <div class="col col-traits">
             <div class="col-title">Traits</div>
-            <label><input type="checkbox" name="finish_traits" value="Integrated Tannin"> Integrated Tannin</label>
-            <label><input type="checkbox" name="finish_traits" value="Chalky/Mineral"> Chalky / Mineral</label>
+            <label><input type="checkbox" name="finish_traits" value="Integrated Tannin"> Tannins Already Integrated </label>
+            <label><input type="checkbox" name="finish_traits" value="Chalky/Mineral"> Chalky / Mineral Tannins</label>
             <label><input type="checkbox" name="finish_traits" value="Saline/Racy"> Saline / Racy (as you want more)</label>
         </div>
         <div class="col col-pros">
@@ -193,16 +222,18 @@
         </div>
     </div>
 
+
+
     <!-- GENERAL & COMMENTS -->
     <div class="general-grid" style="margin-top:20px;">
         <div class="gen-item">
             <h3>Balance</h3>
-<div class="pill-group">
-    <input type="radio" name="balance" value="Disjointed" id="b1" class="pill-radio"><label for="b1" class="pill-label">Disjointed</label>
-    <input type="radio" name="balance" value="Structured" id="b2" class="pill-radio"><label for="b2" class="pill-label">Structured</label>
-    <input type="radio" name="balance" value="Forward" id="b3" class="pill-radio"><label for="b3" class="pill-label">Forward</label>
-    <input type="radio" name="balance" value="Loose" id="b4" class="pill-radio"><label for="b4" class="pill-label">Loose</label>
-</div>
+            <div class="pill-group">
+                <input type="radio" name="balance" value="Disjointed" id="b1" class="pill-radio"><label for="b1" class="pill-label">Disjointed</label>
+                <input type="radio" name="balance" value="Structured" id="b2" class="pill-radio"><label for="b2" class="pill-label">Structured</label>
+                <input type="radio" name="balance" value="Forward" id="b3" class="pill-radio"><label for="b3" class="pill-label">Forward</label>
+                <input type="radio" name="balance" value="Loose" id="b4" class="pill-radio"><label for="b4" class="pill-label">Loose</label>
+            </div>
         </div>
         <div class="gen-item">
             <h3>Profile</h3>
@@ -348,6 +379,9 @@
         btn.textContent = "SAVE";
         btn.classList.remove('update');
         btn.disabled = false;
+        
+        // Hide AI box on new
+        document.getElementById('aiNoteBox').classList.remove('visible');
 
         document.getElementById('prevBtn').disabled = (localData.length === 0);
         document.getElementById('nextBtn').disabled = true; 
@@ -372,6 +406,16 @@
         document.getElementById('comm_too').value = d.comm_too || "";
         document.getElementById('comm_lacks').value = d.comm_lacks || "";
         document.getElementById('comm_rem').value = d.comm_rem || "";
+
+        // SHOW AI NOTE
+        const aiBox = document.getElementById('aiNoteBox');
+        const aiText = document.getElementById('aiNoteText');
+        if(d.ai_note) {
+            aiText.innerHTML = d.ai_note.replace(/\n/g, '<br>');
+            aiBox.classList.add('visible');
+        } else {
+            aiBox.classList.remove('visible');
+        }
     }
 
     function getChecked(n) { return Array.from(document.querySelectorAll(`input[name="${n}"]:checked`)).map(c => c.value); }
@@ -381,6 +425,8 @@
         const btn = document.getElementById('saveBtn');
         const ref = document.getElementById('wineRef').value;
         const sheet = document.getElementById('sheetSelector').value;
+        const aiBox = document.getElementById('aiNoteBox');
+        const aiText = document.getElementById('aiNoteText');
         
         if(!ref) { alert("Enter Wine Name"); return; }
 
@@ -390,8 +436,12 @@
             }
         }
 
-        btn.textContent = "SAVING...";
+        btn.textContent = "AI GENERATING...";
         btn.disabled = true;
+        
+        // Optimistic: Show "Generating" in the UI box
+        aiBox.classList.add('visible');
+        aiText.innerHTML = "<i>Analyzing data & writing note...</i>";
 
         const payload = {
             action: isUpdating ? "update" : "create",
@@ -407,26 +457,43 @@
             comm_rem: document.getElementById('comm_rem').value
         };
 
+        // Note: We use 'cors' here if possible to get the response. 
+        // If Google blocks it, we fallback to reload. 
+        // But Google Web Apps usually return JSON fine if published as "Anyone".
+        
         fetch(SCRIPT_URL, {
-            method: 'POST', mode: 'no-cors',
-            headers: {'Content-Type': 'application/json'},
+            method: 'POST', 
+            headers: {'Content-Type': 'text/plain;charset=utf-8'}, // Text/plain avoids preflight CORS option request
             body: JSON.stringify(payload)
-        }).then(() => {
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.ai_note) {
+                aiText.innerHTML = data.ai_note.replace(/\n/g, '<br>');
+            } else {
+                aiText.textContent = "Note saved, but AI returned empty.";
+            }
+
+            btn.textContent = isUpdating ? "UPDATED" : "SAVED";
+            
+            // Reload background data to keep sync
             setTimeout(() => {
                 loadSheetData(); 
                 if(!isUpdating) {
-                    resetForm(); 
-                    btn.textContent = "SAVED!";
-                    setTimeout(() => btn.textContent = "SAVE", 1000);
+                    // If New, we might want to Keep the form open to read the note?
+                    // Or clear it. Let's keep it open for 2 seconds then clear.
+                    setTimeout(() => resetForm(), 4000);
                 } else {
-                    btn.textContent = "UPDATED!";
-                    setTimeout(() => btn.textContent = "UPDATE", 1000);
+                    btn.textContent = "UPDATE";
                     btn.disabled = false;
                 }
             }, 1000);
-        }).catch(e => {
-            alert("Error: " + e);
+        })
+        .catch(e => {
+            alert("Saved, but couldn't read AI response (CORS limitation?). Check Sheet.");
+            btn.textContent = "SAVED";
             btn.disabled = false;
+            setTimeout(() => loadSheetData(), 1000);
         });
     }
 
@@ -450,4 +517,3 @@
 
 </body>
 </html>
-
