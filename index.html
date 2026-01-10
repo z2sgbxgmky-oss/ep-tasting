@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Burgundy Manager</title>
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --burgundy: #800020;
+            --flaw-bg: #fff5f5; --flaw-border: #fc8181; --flaw-text: #c53030;
+            --trait-bg: #ebf8ff; --trait-border: #63b3ed; --trait-text: #2b6cb0;
+            --pro-bg: #f0fff4; --pro-border: #68d391; --pro-text: #2f855a;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: #2d3748;
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            padding-bottom: 80px; /* Space for footer */
+        }
+
+        /* HEADER */
+        header {
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--burgundy);
+            padding-bottom: 10px;
+        }
+
+        .sheet-dropdown {
+            width: 100%;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--burgundy);
+            border: none;
+            background: transparent;
+            padding: 5px 0;
+            cursor: pointer;
+            appearance: none; 
+        }
+        .sheet-dropdown:focus { outline: none; }
+
+        .wine-input {
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            width: 100%;
+            font-weight: 600;
+            color: #2d3748;
+            box-sizing: border-box;
+            margin-top: 5px;
+        }
+        .wine-input:focus { border-color: var(--burgundy); outline: none; }
+
+        /* SECTIONS */
+        .section-header {
+            font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #a0aec0;
+            border-bottom: 1px solid #edf2f7; margin: 20px 0 8px 0;
+        }
+
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+        @media (max-width: 700px) { .grid-3 { grid-template-columns: 1fr; } }
+
+        .col {
+            padding: 8px; border-radius: 6px; display: flex; flex-direction: column; gap: 6px;
+            border-width: 1px; border-style: solid;
+        }
+        .col-flaws { background: var(--flaw-bg); border-color: var(--flaw-border); }
+        .col-traits { background: var(--trait-bg); border-color: var(--trait-border); }
+        .col-pros { background: var(--pro-bg); border-color: var(--pro-border); }
+
+        .col-title { font-size: 0.65rem; text-transform: uppercase; font-weight: 800; opacity: 0.8; margin: 0; }
+        .col-flaws .col-title { color: var(--flaw-text); }
+        .col-traits .col-title { color: var(--trait-text); }
+        .col-pros .col-title { color: var(--pro-text); }
+
+        /* CHECKBOXES */
+        label { display: flex; align-items: center; font-size: 0.85rem; cursor: pointer; font-weight: 500; }
+        input[type="checkbox"] { margin-right: 8px; accent-color: var(--burgundy); width: 18px; height: 18px; flex-shrink: 0; }
+
+        /* GENERAL */
+        .general-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: #f7fafc; padding: 8px; border-radius: 8px; border: 1px solid #edf2f7; }
+        .gen-item h3 { font-size: 0.65rem; margin: 0 0 4px 0; color: #718096; text-transform: uppercase; font-weight: 700; }
+        .pill-group { display: flex; flex-wrap: wrap; gap: 3px; }
+        .pill-label { padding: 4px 6px; background: #e2e8f0; border-radius: 10px; font-size: 0.7rem; cursor: pointer; font-weight: 600; color: #4a5568; flex: 1; text-align: center; }
+        .pill-radio { display: none; }
+        .pill-radio:checked + .pill-label { background: var(--burgundy); color: white; }
+
+        /* COMMENTS */
+        .comment-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 10px; }
+        .comment-box span { font-size: 0.65rem; font-weight: 700; color: #718096; text-transform: uppercase; }
+        .comment-box input { padding: 6px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 0.85rem; width: 100%; box-sizing: border-box; }
+
+        /* COMPACT FOOTER */
+        .footer-control {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: white; border-top: 1px solid #ddd;
+            display: grid; grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr 0.8fr;
+            height: 60px; z-index: 1000;
+        }
+
+        .ft-btn {
+            background: white; border: none; border-left: 1px solid #eee;
+            font-size: 1.2rem; cursor: pointer; color: #4a5568;
+            display: flex; justify-content: center; align-items: center;
+            font-weight: 700; padding: 0;
+            transition: background 0.2s;
+        }
+        .ft-btn:active { background: #f7fafc; }
+        .ft-btn:disabled { color: #e2e8f0; cursor: not-allowed; }
+
+        .btn-save {
+            background: var(--burgundy); color: white;
+            font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .btn-save.update { background: #2f855a; }
+        .btn-trash { color: #c53030; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <select id="sheetSelector" class="sheet-dropdown" onchange="loadSheetData()">
+            <option>Loading Database...</option>
+        </select>
+        <input type="text" id="wineRef" class="wine-input" placeholder="Wine Name / Reference">
+    </header>
+
+    <!-- NOSE -->
+    <div class="section-header">Nose</div>
+    <div class="grid-3">
+        <div class="col col-flaws">
+            <div class="col-title">Flaws</div>
+            <label><input type="checkbox" name="nose_flaws" value="Nail Polish/Manure"> Nail Polish/Manure</label>
+            <label><input type="checkbox" name="nose_flaws" value="Too Alcoholic"> Too Alcoholic</label>
+            <label><input type="checkbox" name="nose_flaws" value="Too Oaky"> Too Oaky</label>
+        </div>
+        <div class="col col-traits">
+            <div class="col-title">Traits</div>
+            <label><input type="checkbox" name="nose_traits" value="Sous-bois/Funk"> Sous-bois / Funk</label>
+            <label><input type="checkbox" name="nose_traits" value="Reduction/Sulphur"> Reduction/Sulphur</label>
+            <label><input type="checkbox" name="nose_traits" value="Muted/Closed"> Muted / Closed</label>
+        </div>
+        <div class="col col-pros">
+            <div class="col-title">Pros</div>
+            <label><input type="checkbox" name="nose_pros" value="Powerful"> Powerful</label>
+            <label><input type="checkbox" name="nose_pros" value="Defined"> Defined</label>
+            <label><input type="checkbox" name="nose_pros" value="Complex"> Complex</label>
+        </div>
+    </div>
+
+    <!-- PALATE -->
+    <div class="section-header">Palate</div>
+    <div class="grid-3">
+        <div class="col col-flaws">
+            <div class="col-title">Flaws</div>
+            <label><input type="checkbox" name="palate_flaws" value="Weak/Dilute"> Weak / Dilute</label>
+            <label><input type="checkbox" name="palate_flaws" value="Candied"> Candied</label>
+            <label><input type="checkbox" name="palate_flaws" value="Flabby"> Flabby</label>
+        </div>
+        <div class="col col-traits">
+            <div class="col-title">Traits</div>
+            <label><input type="checkbox" name="palate_traits" value="Stemmy/Vegetal"> Stemmy / Vegetal</label>
+            <label><input type="checkbox" name="palate_traits" value="Tightly wound"> Tightly wound</label>
+            <label><input type="checkbox" name="palate_traits" value="Transparent/Ethereal"> Transparent/Ethereal</label>
+        </div>
+        <div class="col col-pros">
+            <div class="col-title">Pros</div>
+            <label><input type="checkbox" name="palate_pros" value="Rich/Dense"> Rich / Dense</label>
+            <label><input type="checkbox" name="palate_pros" value="Complex"> Complex</label>
+            <label><input type="checkbox" name="palate_pros" value="Precise"> Precise</label>
+        </div>
+    </div>
+
+    <!-- AFTERTASTE -->
+    <div class="section-header">Aftertaste</div>
+    <div class="grid-3">
+        <div class="col col-flaws">
+            <div class="col-title">Flaws</div>
+            <label><input type="checkbox" name="finish_flaws" value="Heat/Burn"> Heat / Burn</label>
+            <label><input type="checkbox" name="finish_flaws" value="Short/Clipped"> Short / Clipped</label>
+            <label><input type="checkbox" name="finish_flaws" value="Harsh/Rustic"> Harsh / Rustic</label>
+        </div>
+        <div class="col col-traits">
+            <div class="col-title">Traits</div>
+            <label><input type="checkbox" name="finish_traits" value="Integrated Tannin"> Integrated Tannin</label>
+            <label><input type="checkbox" name="finish_traits" value="Chalky/Mineral"> Chalky / Mineral</label>
+            <label><input type="checkbox" name="finish_traits" value="Saline/Racy"> Saline / Racy</label>
+        </div>
+        <div class="col col-pros">
+            <div class="col-title">Pros</div>
+            <label><input type="checkbox" name="finish_pros" value="Vivid+Long"> Vivid + Long</label>
+            <label><input type="checkbox" name="finish_pros" value="Complex/Expanding"> Complex/Expanding</label>
+            <label><input type="checkbox" name="finish_pros" value="Accented Note"> Accented Note</label>
+        </div>
+    </div>
+
+    <!-- GENERAL & COMMENTS -->
+    <div class="general-grid" style="margin-top:20px;">
+        <div class="gen-item">
+            <h3>Balance</h3>
+            <div class="pill-group">
+                <input type="radio" name="balance" value="Off" id="b1" class="pill-radio"><label for="b1" class="pill-label">Off</label>
+                <input type="radio" name="balance" value="EP" id="b2" class="pill-radio"><label for="b2" class="pill-label">EP</label>
+                <input type="radio" name="balance" value="Young" id="b3" class="pill-radio"><label for="b3" class="pill-label">Young</label>
+                <input type="radio" name="balance" value="None" id="b4" class="pill-radio"><label for="b4" class="pill-label">None</label>
+            </div>
+        </div>
+        <div class="gen-item">
+            <h3>Profile</h3>
+            <div class="pill-group">
+                <input type="radio" name="profile" value="Red" id="p1" class="pill-radio"><label for="p1" class="pill-label">Red</label>
+                <input type="radio" name="profile" value="Blue" id="p2" class="pill-radio"><label for="p2" class="pill-label">Blue</label>
+                <input type="radio" name="profile" value="Black" id="p3" class="pill-radio"><label for="p3" class="pill-label">Black</label>
+                <input type="radio" name="profile" value="Cooked" id="p4" class="pill-radio"><label for="p4" class="pill-label">Cooked</label>
+            </div>
+        </div>
+        <div class="gen-item">
+            <h3>True To</h3>
+            <div class="pill-group">
+                <label style="flex:auto; font-size:0.7rem;"><input type="checkbox" name="true_to" value="Terroir"> Terroir</label>
+                <label style="flex:auto; font-size:0.7rem;"><input type="checkbox" name="true_to" value="Producer"> Producer</label>
+                <label style="flex:auto; font-size:0.7rem;"><input type="checkbox" name="true_to" value="Vintage"> Vintage</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="comment-grid">
+        <div class="comment-box"><span>Too...</span><input type="text" id="comm_too"></div>
+        <div class="comment-box"><span>Lacks...</span><input type="text" id="comm_lacks"></div>
+        <div class="comment-box"><span>Remarkable...</span><input type="text" id="comm_rem"></div>
+    </div>
+
+</div>
+
+<!-- COMPACT FOOTER -->
+<div class="footer-control">
+    <button id="saveBtn" class="ft-btn btn-save" onclick="submitData()">SAVE</button>
+    <button class="ft-btn" onclick="resetForm()">+</button>
+    <button id="prevBtn" class="ft-btn" onclick="nav(-1)">&lt;</button>
+    <button id="nextBtn" class="ft-btn" onclick="nav(1)">&gt;</button>
+    <button class="ft-btn btn-trash" onclick="deleteRecord()">🗑</button>
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwvhb_OSlNid4L39wJ0oiqo7tkCkhQ2U103i9V0N7r25pdJB8Ioj19YPOu2oHtR7YiU/exec";
+
+    let localData = [];
+    let currentIndex = -1; 
+    let isUpdating = false;
+
+    window.onload = function() { fetchSheets(); };
+
+    function fetchSheets() {
+        const sel = document.getElementById('sheetSelector');
+        fetch(`${SCRIPT_URL}?action=getSheets`)
+        .then(r => r.json())
+        .then(d => {
+            sel.innerHTML = "";
+            d.sheets.forEach(s => {
+                let opt = document.createElement('option');
+                opt.value = s; opt.text = s;
+                sel.add(opt);
+            });
+            if(d.sheets.length > 0) loadSheetData();
+        });
+    }
+
+    function loadSheetData() {
+        const sheet = document.getElementById('sheetSelector').value;
+        const btn = document.getElementById('saveBtn');
+        btn.textContent = "...";
+        
+        fetch(`${SCRIPT_URL}?action=getData&sheet=${sheet}`)
+        .then(r => r.json())
+        .then(d => {
+            localData = d.rows || [];
+            resetForm(); 
+        });
+    }
+
+    function nav(dir) {
+        if(localData.length === 0) return;
+        if(currentIndex === -1 && dir === 1) return; // Can't go forward from New Record
+
+        let newIndex;
+        if(currentIndex === -1 && dir === -1) {
+            newIndex = localData.length - 1; // From New to Last
+        } else {
+            newIndex = currentIndex + dir;
+        }
+
+        // Stops (No Looping)
+        if (newIndex < 0) newIndex = 0;
+        if (newIndex >= localData.length) newIndex = localData.length - 1;
+        
+        loadRecord(newIndex);
+    }
+
+    function loadRecord(idx) {
+        currentIndex = idx;
+        isUpdating = true;
+        fillForm(localData[idx]);
+        
+        const btn = document.getElementById('saveBtn');
+        btn.textContent = "UPDATE";
+        btn.classList.add('update');
+        
+        // Button Logic
+        document.getElementById('prevBtn').disabled = (idx === 0);
+        document.getElementById('nextBtn').disabled = (idx === localData.length - 1);
+    }
+
+    function resetForm() {
+        currentIndex = -1;
+        isUpdating = false;
+        
+        document.getElementById('wineRef').value = "";
+        document.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
+        document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+        document.querySelectorAll('input[type="text"]').forEach(t => t.value = "");
+        
+        const btn = document.getElementById('saveBtn');
+        btn.textContent = "SAVE";
+        btn.classList.remove('update');
+        btn.disabled = false;
+
+        document.getElementById('prevBtn').disabled = (localData.length === 0);
+        document.getElementById('nextBtn').disabled = true; // Can't go Next from New
+    }
+
+    function fillForm(d) {
+        document.getElementById('wineRef').value = d.ref || "";
+        const check = (n, v) => {
+            if(!v) return;
+            const arr = Array.isArray(v) ? v : [v];
+            arr.forEach(val => {
+                const el = document.querySelector(`input[name="${n}"][value="${val}"]`);
+                if(el) el.checked = true;
+            });
+        };
+        check('nose_flaws', d.nose_flaws); check('nose_traits', d.nose_traits); check('nose_pros', d.nose_pros);
+        check('palate_flaws', d.palate_flaws); check('palate_traits', d.palate_traits); check('palate_pros', d.palate_pros);
+        check('finish_flaws', d.finish_flaws); check('finish_traits', d.finish_traits); check('finish_pros', d.finish_pros);
+        check('true_to', d.true_to);
+        if(d.balance) { let el = document.querySelector(`input[name="balance"][value="${d.balance}"]`); if(el) el.checked = true; }
+        if(d.profile) { let el = document.querySelector(`input[name="profile"][value="${d.profile}"]`); if(el) el.checked = true; }
+        document.getElementById('comm_too').value = d.comm_too || "";
+        document.getElementById('comm_lacks').value = d.comm_lacks || "";
+        document.getElementById('comm_rem').value = d.comm_rem || "";
+    }
+
+    function getChecked(n) { return Array.from(document.querySelectorAll(`input[name="${n}"]:checked`)).map(c => c.value); }
+    function getRadio(n) { let el = document.querySelector(`input[name="${n}"]:checked`); return el ? el.value : ""; }
+
+    function submitData() {
+        const btn = document.getElementById('saveBtn');
+        const ref = document.getElementById('wineRef').value;
+        const sheet = document.getElementById('sheetSelector').value;
+        
+        if(!ref) { alert("Enter Wine Name"); return; }
+
+        btn.textContent = "SAVING...";
+        btn.disabled = true;
+
+        const payload = {
+            action: isUpdating ? "update" : "create",
+            rowIndex: isUpdating ? localData[currentIndex].rowIndex : null,
+            sheetName: sheet,
+            ref: ref,
+            nose_flaws: getChecked('nose_flaws'), nose_traits: getChecked('nose_traits'), nose_pros: getChecked('nose_pros'),
+            palate_flaws: getChecked('palate_flaws'), palate_traits: getChecked('palate_traits'), palate_pros: getChecked('palate_pros'),
+            finish_flaws: getChecked('finish_flaws'), finish_traits: getChecked('finish_traits'), finish_pros: getChecked('finish_pros'),
+            balance: getRadio('balance'), profile: getRadio('profile'), true_to: getChecked('true_to'),
+            comm_too: document.getElementById('comm_too').value,
+            comm_lacks: document.getElementById('comm_lacks').value,
+            comm_rem: document.getElementById('comm_rem').value
+        };
+
+        fetch(SCRIPT_URL, {
+            method: 'POST', mode: 'no-cors',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        }).then(() => {
+            setTimeout(() => {
+                loadSheetData(); 
+                if(!isUpdating) {
+                    resetForm(); 
+                    btn.textContent = "SAVED!";
+                    setTimeout(() => btn.textContent = "SAVE", 1000);
+                } else {
+                    btn.textContent = "UPDATED!";
+                    setTimeout(() => btn.textContent = "UPDATE", 1000);
+                    btn.disabled = false;
+                }
+            }, 1000);
+        }).catch(e => {
+            alert("Error: " + e);
+            btn.disabled = false;
+        });
+    }
+
+    function deleteRecord() {
+        if(!isUpdating) return;
+        if(!confirm("Delete?")) return;
+        
+        fetch(SCRIPT_URL, {
+            method: 'POST', mode: 'no-cors',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                action: "delete",
+                rowIndex: localData[currentIndex].rowIndex,
+                sheetName: document.getElementById('sheetSelector').value
+            })
+        }).then(() => {
+            setTimeout(loadSheetData, 1000);
+        });
+    }
+</script>
+
+</body>
+</html>
