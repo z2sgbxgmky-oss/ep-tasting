@@ -354,6 +354,7 @@
     }
 
     function loadRecord(idx) {
+        resetForm();  
         currentIndex = idx;
         isUpdating = true;
         fillForm(localData[idx]);
