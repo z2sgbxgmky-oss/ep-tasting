@@ -477,25 +477,31 @@
             
             // 3. Logic: Update vs New
             if (isUpdating) {
-                // CASE A: UPDATE -> STAY HERE
-                // We do NOT reset the form. We just enable the button again.
-                // We reload sheet data in background just to be safe, but don't move user.
+                // CASE A: UPDATE -> STAY HERE (The "Hard Stop" Fix)
+                // We REMOVED loadSheetData() from here.
+                
+                // Just re-enable the button.
                 setTimeout(() => {
-                    loadSheetData(); 
                     btn.textContent = "UPDATE";
                     btn.disabled = false;
                 }, 1000);
+                
+                // Update local data cache manually so navigation works
+                if (localData[currentIndex]) {
+                    // Update the note in memory
+                    localData[currentIndex].ai_note = data.ai_note; 
+                    // Update the ref name in memory in case they changed it
+                    localData[currentIndex].ref = ref;
+                }
+
             } else {
                 // CASE B: NEW RECORD -> RESET/MOVE ON
-                // Keep form open for 2s so user can read the note/score, then reset.
+                // Here we MUST load sheet data to get the new ID/Row
                 setTimeout(() => {
                     loadSheetData(); 
-                    setTimeout(() => {
-                        resetForm(); 
-                        btn.textContent = "SAVE";
-                        btn.disabled = false;
-                    }, 2000); // 2 second delay to read
-                }, 1000);
+                    // loadSheetData will call resetForm(), so we don't need to call it again manually,
+                    // but doing so ensures the UI is clean.
+                }, 2000); 
             }
         })
         .catch(e => {
@@ -506,10 +512,12 @@
         });
     }
 
-
     function deleteRecord() {
         if(!isUpdating) return;
         if(!confirm("Delete?")) return;
+        
+        // Remember where we were
+        let indexToDelete = currentIndex;
         
         fetch(SCRIPT_URL, {
             method: 'POST', mode: 'no-cors',
@@ -520,9 +528,26 @@
                 sheetName: document.getElementById('sheetSelector').value
             })
         }).then(() => {
-            setTimeout(loadSheetData, 1000);
+            // Reload data, but try to stay nearby
+            const sheet = document.getElementById('sheetSelector').value;
+            fetch(`${SCRIPT_URL}?action=getData&sheet=${sheet}`)
+            .then(r => r.json())
+            .then(d => {
+                localData = d.rows || [];
+                
+                // Logic: Go to the previous record, or stay at 0 if we deleted the first.
+                // If list is empty, reset.
+                if (localData.length === 0) {
+                    resetForm();
+                } else {
+                    let newIdx = indexToDelete - 1;
+                    if (newIdx < 0) newIdx = 0;
+                    loadRecord(newIdx);
+                }
+            });
         });
     }
+
 </script>
 
 </body>
