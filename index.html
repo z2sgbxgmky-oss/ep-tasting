@@ -458,37 +458,45 @@
             comm_rem: document.getElementById('comm_rem').value
         };
 
-        // Note: We use 'cors' here if possible to get the response. 
-        // If Google blocks it, we fallback to reload. 
-        // But Google Web Apps usually return JSON fine if published as "Anyone".
-        
         fetch(SCRIPT_URL, {
             method: 'POST', 
-            headers: {'Content-Type': 'text/plain;charset=utf-8'}, // Text/plain avoids preflight CORS option request
+            headers: {'Content-Type': 'text/plain;charset=utf-8'}, 
             body: JSON.stringify(payload)
         })
         .then(response => response.json())
         .then(data => {
+            // 1. Show AI Note
             if(data.ai_note) {
                 aiText.innerHTML = data.ai_note.replace(/\n/g, '<br>');
             } else {
                 aiText.textContent = "Note saved, but AI returned empty.";
             }
 
+            // 2. Handle Button State
             btn.textContent = isUpdating ? "UPDATED" : "SAVED";
             
-            // Reload background data to keep sync
-            setTimeout(() => {
-                loadSheetData(); 
-                if(!isUpdating) {
-                    // If New, we might want to Keep the form open to read the note?
-                    // Or clear it. Let's keep it open for 2 seconds then clear.
-                    setTimeout(() => resetForm(), 4000);
-                } else {
+            // 3. Logic: Update vs New
+            if (isUpdating) {
+                // CASE A: UPDATE -> STAY HERE
+                // We do NOT reset the form. We just enable the button again.
+                // We reload sheet data in background just to be safe, but don't move user.
+                setTimeout(() => {
+                    loadSheetData(); 
                     btn.textContent = "UPDATE";
                     btn.disabled = false;
-                }
-            }, 1000);
+                }, 1000);
+            } else {
+                // CASE B: NEW RECORD -> RESET/MOVE ON
+                // Keep form open for 2s so user can read the note/score, then reset.
+                setTimeout(() => {
+                    loadSheetData(); 
+                    setTimeout(() => {
+                        resetForm(); 
+                        btn.textContent = "SAVE";
+                        btn.disabled = false;
+                    }, 2000); // 2 second delay to read
+                }, 1000);
+            }
         })
         .catch(e => {
             alert("Saved, but couldn't read AI response (CORS limitation?). Check Sheet.");
@@ -497,6 +505,7 @@
             setTimeout(() => loadSheetData(), 1000);
         });
     }
+
 
     function deleteRecord() {
         if(!isUpdating) return;
