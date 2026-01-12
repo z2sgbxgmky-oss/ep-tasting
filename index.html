@@ -543,13 +543,13 @@ function renderScoreReport(breakdownData) {
             let badgeHtml = renderScoreReport(data.scoreBreakdown);
 
             // 2. Build Complete HTML Block
-            let combinedHtml = `
+              let combinedHtml = `
                 <div style="font-family:serif; font-size:1.1em; line-height:1.4; color:#333;">
                     ${data.ai_note}
                 </div>
                 <div style="margin-top:15px; padding-top:10px; border-top:1px solid #eee;">
                     <div style="font-size:1.2em; font-weight:bold; margin-bottom:5px;">
-                        Score: ${data.scoreDisplay}
+                        <span style="color:#444;">${data.profileName}</span> Score: ${data.scoreDisplay}, <span style="font-weight:normal; font-size:0.9em; color:#777;">${data.tastedDate}</span>
                     </div>
                     <div style="font-size:0.85em; color:#666;">
                         ${badgeHtml}
