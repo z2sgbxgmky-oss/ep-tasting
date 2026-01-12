@@ -79,6 +79,17 @@
         }
         .wine-input:focus { border-color: var(--burgundy); outline: none; }
 
+        
+/* REPORT BADGES */
+.report-badge { display: inline-block; padding: 1px 6px; margin: 0 4px 3px 0; border-radius: 4px; font-family: sans-serif; font-size: 10px; border: 1px solid transparent; }
+.badge-pro { border-color: #a5d6a7; background-color: #e8f5e9; color: #1b5e20; }
+.badge-flaw { border-color: #ef9a9a; background-color: #ffebee; color: #b71c1c; }
+.badge-trait { border-color: #90caf9; background-color: #e3f2fd; color: #0d47a1; }
+.badge-info { border-color: #bdbdbd; background-color: #f5f5f5; color: #616161; }
+.badge-neutral { border-color: #bdbdbd; background-color: #f5f5f5; color: #757575; text-decoration: line-through; }
+.report-spacer { display: block; height: 4px; }
+
+        
         /* AI NOTE BOX */
 .ai-note-box {
     background: transparent;  /* No background color */
@@ -422,10 +433,37 @@
     function getChecked(n) { return Array.from(document.querySelectorAll(`input[name="${n}"]:checked`)).map(c => c.value); }
     function getRadio(n) { let el = document.querySelector(`input[name="${n}"]:checked`); return el ? el.value : ""; }
 
+function renderScoreReport(breakdownData) {
+    if (!breakdownData) return "";
+    let html = "";
+    breakdownData.forEach(item => {
+        if (item.type === 'spacer') { html += '<div class="report-spacer"></div>'; return; }
+        if (item.type === 'break') { html += '<br>'; return; }
+        
+        let valDisplay = "";
+        if (item.value !== undefined && item.value !== null) {
+            let sign = (item.value > 0) ? "+" : "";
+            valDisplay = " <b>" + sign + item.value + "</b>";
+        }
+        
+        let styleAttr = "";
+        if (item.type === 'pro' && item.percent) {
+            styleAttr = `style="background: linear-gradient(90deg, #b9f6ca ${item.percent}%, #f1f8e9 ${item.percent}%);"`;
+        }
+        
+        html += `<span class="report-badge badge-${item.type}" ${styleAttr}>${item.label}${valDisplay}</span>`;
+    });
+    return html;
+}
+
+
+    
     function submitData() {
         const btn = document.getElementById('saveBtn');
         const ref = document.getElementById('wineRef').value;
         const sheet = document.getElementById('sheetSelector').value;
+        
+        // UI Elements for Feedback
         const aiBox = document.getElementById('aiNoteBox');
         const aiText = document.getElementById('aiNoteText');
         
@@ -440,7 +478,7 @@
         btn.textContent = "AI GENERATING...";
         btn.disabled = true;
         
-        // Optimistic: Show "Generating" in the UI box
+        // Optimistic UI: Show "Generating" 
         aiBox.classList.add('visible');
         aiText.innerHTML = "<i>Analyzing data & writing note...</i>";
 
@@ -465,52 +503,75 @@
         })
         .then(response => response.json())
         .then(data => {
-            // 1. Show AI Note
-            if(data.ai_note) {
-                aiText.innerHTML = data.ai_note.replace(/\n/g, '<br>');
-            } else {
-                aiText.textContent = "Note saved, but AI returned empty.";
+            if(data.error) {
+                alert("Error: " + data.error);
+                btn.textContent = "ERROR";
+                btn.disabled = false;
+                return;
             }
 
-            // 2. Handle Button State
+            // --- NEW: RENDER VISUAL REPORT (Score + Badges + Note) ---
+            
+            // 1. Generate Badges HTML
+            // Note: data.scoreBreakdown comes from the new Backend we wrote
+            let badgeHtml = renderScoreReport(data.scoreBreakdown);
+
+            // 2. Build Complete HTML Block
+            let combinedHtml = `
+                <div style="font-family:serif; font-size:1.1em; line-height:1.4; color:#333;">
+                    ${data.ai_note}
+                </div>
+                <div style="margin-top:15px; padding-top:10px; border-top:1px solid #eee;">
+                    <div style="font-size:1.2em; font-weight:bold; margin-bottom:5px;">
+                        Score: ${data.scoreDisplay}
+                    </div>
+                    <div style="font-size:0.85em; color:#666;">
+                        ${badgeHtml}
+                    </div>
+                </div>
+            `;
+
+            // 3. Inject into UI
+            aiText.innerHTML = combinedHtml;
+            aiBox.classList.add('visible');
+
+            // --- END VISUAL REPORT ---
+
+            // 4. Handle Button State
             btn.textContent = isUpdating ? "UPDATED" : "SAVED";
             
-            // 3. Logic: Update vs New
+            // 5. Logic: Update vs New
             if (isUpdating) {
-                // CASE A: UPDATE -> STAY HERE (The "Hard Stop" Fix)
-                // We REMOVED loadSheetData() from here.
-                
-                // Just re-enable the button.
+                // CASE A: UPDATE -> STAY HERE
                 setTimeout(() => {
                     btn.textContent = "UPDATE";
                     btn.disabled = false;
                 }, 1000);
                 
-                // Update local data cache manually so navigation works
+                // Update local cache
                 if (localData[currentIndex]) {
-                    // Update the note in memory
                     localData[currentIndex].ai_note = data.ai_note; 
-                    // Update the ref name in memory in case they changed it
                     localData[currentIndex].ref = ref;
+                    // Cache new fields too if you want them immediately available without reload
+                    localData[currentIndex].scoreDisplay = data.scoreDisplay;
+                    localData[currentIndex].scoreBreakdown = data.scoreBreakdown;
                 }
 
             } else {
-                // CASE B: NEW RECORD -> RESET/MOVE ON
-                // Here we MUST load sheet data to get the new ID/Row
+                // CASE B: NEW RECORD -> RESET
                 setTimeout(() => {
                     loadSheetData(); 
-                    // loadSheetData will call resetForm(), so we don't need to call it again manually,
-                    // but doing so ensures the UI is clean.
                 }, 2000); 
             }
         })
         .catch(e => {
-            alert("Saved, but couldn't read AI response (CORS limitation?). Check Sheet.");
-            btn.textContent = "SAVED";
+            console.error(e);
+            alert("Network Error or CORS issue. Check Console.");
+            btn.textContent = "ERROR";
             btn.disabled = false;
-            setTimeout(() => loadSheetData(), 1000);
         });
     }
+
 
     function deleteRecord() {
         if(!isUpdating) return;
