@@ -401,7 +401,7 @@
 
 
     // --- CENTRALIZED HTML BUILDER ---
-// --- VERSION WITH PROFILE AT BOTTOM (TINY FOOTER) ---
+// --- VERSION WITH UNIFIED FONT SIZES ---
 function buildReportHtml(note, score, breakdown, date, profile) {
     if (!breakdown || !score) {
         return note ? note.replace(/\n/g, '<br>') : "";
@@ -427,9 +427,10 @@ function buildReportHtml(note, score, breakdown, date, profile) {
         </div>
         
         <div style="font-family:-apple-system, sans-serif;">
-            <div style="font-size:1.2em; font-weight:800; color:#2c3e50; margin-bottom:6px; display:flex; align-items:baseline;">
-                Score: ${score}, 
-                <span style="font-weight:normal; font-size:0.7em; color:#555; margin-left:6px;">${tDate}</span>
+            <!-- Unified Line: Same Size (1.15em), Different Weight -->
+            <div style="font-size:1.15em; color:#2c3e50; margin-bottom:6px; display:flex; align-items:baseline;">
+                <span style="font-weight:800;">Score: ${score},</span> 
+                <span style="font-weight:normal; color:#555; margin-left:6px;">${tDate}</span>
             </div>
             
             <div style="font-size:0.9em; line-height:1.8;">
@@ -442,6 +443,7 @@ function buildReportHtml(note, score, breakdown, date, profile) {
         </div>
     `;
 }
+
 
 
     
