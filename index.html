@@ -401,9 +401,9 @@
 
 
     // --- CENTRALIZED HTML BUILDER ---
+// --- VERSION WITH PROFILE AT BOTTOM (TINY FOOTER) ---
 function buildReportHtml(note, score, breakdown, date, profile) {
     if (!breakdown || !score) {
-        // Fallback for old records without breakdown data
         return note ? note.replace(/\n/g, '<br>') : "";
     }
 
@@ -411,24 +411,38 @@ function buildReportHtml(note, score, breakdown, date, profile) {
     let pName = profile || "Burgundy EP"; 
     let tDate = date || ""; 
 
+    let formattedNote = note;
+    if (note) {
+        let paragraphs = note.split(/\n\s*\n/);
+        if (paragraphs.length > 1) {
+            formattedNote = paragraphs.map(p => `<p style="margin-bottom: 12px;">${p.trim()}</p>`).join("");
+        } else {
+            formattedNote = note.replace(/\n/g, '<br>');
+        }
+    }
+
     return `
-        <div style="font-family:serif; font-size:1.05em; line-height:1.5; color:#333; margin-bottom: 20px;">
-            ${note}
+        <div style="font-family:serif; font-size:1.05em; line-height:1.5; color:#333; margin-bottom: 25px;">
+            ${formattedNote}
         </div>
         
         <div style="font-family:-apple-system, sans-serif;">
-            <div style="font-size:1.1em; font-weight:bold; color:#2c3e50; margin-bottom:6px;">
-                <span style="font-weight:normal; font-size:0.9em; color:#666; margin-right:4px;">${pName}</span>
+            <div style="font-size:1.2em; font-weight:800; color:#2c3e50; margin-bottom:6px; display:flex; align-items:baseline;">
                 Score: ${score}, 
-                <span style="font-weight:normal; font-size:0.9em; color:#777;">${tDate}</span>
+                <span style="font-weight:normal; font-size:0.7em; color:#555; margin-left:6px;">${tDate}</span>
             </div>
             
             <div style="font-size:0.9em; line-height:1.8;">
                 ${badgeHtml}
             </div>
+            
+            <div style="font-size:9px; color:#ccc; margin-top:12px; text-transform:uppercase; letter-spacing:0.5px;">
+                Profile: ${pName}
+            </div>
         </div>
     `;
 }
+
 
     
     function fillForm(d) {
@@ -484,21 +498,32 @@ function renderScoreReport(breakdownData) {
         if (item.type === 'spacer') { html += '<div class="report-spacer"></div>'; return; }
         if (item.type === 'break') { html += '<br>'; return; }
         
+        // 1. Handle Value Display (+1.2, -2, etc)
         let valDisplay = "";
         if (item.value !== undefined && item.value !== null) {
             let sign = (item.value > 0) ? "+" : "";
             valDisplay = " <b>" + sign + item.value + "</b>";
         }
         
+        // 2. Handle Label Formatting (Bolding the "X" in "X / Y")
+        let labelDisplay = item.label;
+        if (item.type === 'pro') {
+            // Regex to find " 2.5 / 5.0" and bold the "2.5"
+            // Looks for: space + number + space + slash + space + number
+            labelDisplay = labelDisplay.replace(/ (\d+(\.\d+)?) \/ (\d+(\.\d+)?)/, ' <b>$1</b> / $3');
+        }
+
+        // 3. Handle Gradient Background
         let styleAttr = "";
         if (item.type === 'pro' && item.percent) {
             styleAttr = `style="background: linear-gradient(90deg, #b9f6ca ${item.percent}%, #f1f8e9 ${item.percent}%);"`;
         }
         
-        html += `<span class="report-badge badge-${item.type}" ${styleAttr}>${item.label}${valDisplay}</span>`;
+        html += `<span class="report-badge badge-${item.type}" ${styleAttr}>${labelDisplay}${valDisplay}</span>`;
     });
     return html;
 }
+
 
 
     
