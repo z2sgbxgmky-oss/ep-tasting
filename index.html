@@ -400,6 +400,7 @@
     }
 
     function fillForm(d) {
+        // ... (Inputs filling logic remains the same) ...
         document.getElementById('wineRef').value = d.ref || "";
         const check = (n, v) => {
             if(!v) return;
@@ -419,11 +420,36 @@
         document.getElementById('comm_lacks').value = d.comm_lacks || "";
         document.getElementById('comm_rem').value = d.comm_rem || "";
 
-        // SHOW AI NOTE
+        // --- UPDATED DISPLAY LOGIC ---
         const aiBox = document.getElementById('aiNoteBox');
         const aiText = document.getElementById('aiNoteText');
-        if(d.ai_note) {
-            aiText.innerHTML = d.ai_note.replace(/\n/g, '<br>');
+        
+        let finalHtml = "";
+
+        if (d.scoreBreakdown && d.scoreDisplay) {
+            // NEW FORMAT: Build it dynamically
+            let badgeHtml = renderScoreReport(d.scoreBreakdown);
+            finalHtml = `
+                <div style="font-family:serif; font-size:1.1em; line-height:1.4; color:#333;">
+                    ${d.ai_note}
+                </div>
+                <div style="margin-top:15px; padding-top:10px; border-top:1px solid #eee;">
+                    <div style="font-size:1.2em; font-weight:bold; margin-bottom:5px;">
+                        Score: ${d.scoreDisplay}
+                    </div>
+                    <div style="font-size:0.85em; color:#666;">
+                        ${badgeHtml}
+                    </div>
+                </div>
+            `;
+        } else if (d.ai_note) {
+            // OLD FORMAT: Note contains everything (Score + Badges baked in HTML)
+            // Just replace newlines and show "As Is"
+            finalHtml = d.ai_note.replace(/\n/g, '<br>');
+        }
+
+        if(finalHtml) {
+            aiText.innerHTML = finalHtml;
             aiBox.classList.add('visible');
         } else {
             aiBox.classList.remove('visible');
