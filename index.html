@@ -399,6 +399,37 @@
         document.getElementById('nextBtn').disabled = true; 
     }
 
+
+    // --- CENTRALIZED HTML BUILDER ---
+function buildReportHtml(note, score, breakdown, date, profile) {
+    if (!breakdown || !score) {
+        // Fallback for old records without breakdown data
+        return note ? note.replace(/\n/g, '<br>') : "";
+    }
+
+    let badgeHtml = renderScoreReport(breakdown);
+    let pName = profile || "Burgundy EP"; 
+    let tDate = date || ""; 
+
+    return `
+        <div style="font-family:serif; font-size:1.05em; line-height:1.5; color:#333; margin-bottom: 20px;">
+            ${note}
+        </div>
+        
+        <div style="font-family:-apple-system, sans-serif;">
+            <div style="font-size:1.1em; font-weight:bold; color:#2c3e50; margin-bottom:6px;">
+                <span style="font-weight:normal; font-size:0.9em; color:#666; margin-right:4px;">${pName}</span>
+                Score: ${score}, 
+                <span style="font-weight:normal; font-size:0.9em; color:#777;">${tDate}</span>
+            </div>
+            
+            <div style="font-size:0.9em; line-height:1.8;">
+                ${badgeHtml}
+            </div>
+        </div>
+    `;
+}
+
     
     function fillForm(d) {
         document.getElementById('wineRef').value = d.ref || "";
@@ -420,41 +451,18 @@
         document.getElementById('comm_lacks').value = d.comm_lacks || "";
         document.getElementById('comm_rem').value = d.comm_rem || "";
 
+      // --- SIMPLIFIED DISPLAY LOGIC ---
         const aiBox = document.getElementById('aiNoteBox');
         const aiText = document.getElementById('aiNoteText');
         
-        let finalHtml = "";
-
-        if (d.scoreBreakdown && d.scoreDisplay) {
-            // NEW RECORDS (Unified Template)
-            let badgeHtml = renderScoreReport(d.scoreBreakdown);
-            let pName = d.profileName || "Burgundy EP"; 
-            let tDate = d.tastedDate || ""; 
-
-            finalHtml = `
-                <div style="font-family:serif; font-size:1.1em; line-height:1.4; color:#333; margin-bottom: 25px;">
-                    ${d.ai_note}
-                </div>
-                
-                <div style="font-family:-apple-system, sans-serif;">
-                    <div style="font-size:1.4em; font-weight:800; color:#2c3e50; margin-bottom:8px; display:flex; align-items:baseline; gap:8px;">
-                        Score: ${d.scoreDisplay}, 
-                        <span style="font-weight:normal; font-size:0.7em; color:#555;">${tDate}</span>
-                    </div>
-                    
-                    <div style="font-size:0.9em; line-height:1.8;">
-                        ${badgeHtml}
-                    </div>
-                    
-                    <div style="font-size:9px; color:#ccc; margin-top:8px; text-transform:uppercase; letter-spacing:0.5px;">
-                        Profile: ${pName}
-                    </div>
-                </div>
-            `;
-        } else if (d.ai_note) {
-            // OLD RECORDS
-            finalHtml = d.ai_note.replace(/\n/g, '<br>');
-        }
+        // Use the centralized builder
+        let finalHtml = buildReportHtml(
+            d.ai_note, 
+            d.scoreDisplay, 
+            d.scoreBreakdown, 
+            d.tastedDate, 
+            d.profileName
+        );
 
         if(finalHtml) {
             aiText.innerHTML = finalHtml;
@@ -542,28 +550,14 @@ function renderScoreReport(breakdownData) {
                 return;
             }
 
-            // UNIFIED TEMPLATE (Same as fillForm)
-            let badgeHtml = renderScoreReport(data.scoreBreakdown);
-            let combinedHtml = `
-                <div style="font-family:serif; font-size:1.1em; line-height:1.4; color:#333; margin-bottom: 25px;">
-                    ${data.ai_note}
-                </div>
-                
-                <div style="font-family:-apple-system, sans-serif;">
-                    <div style="font-size:1.4em; font-weight:800; color:#2c3e50; margin-bottom:8px; display:flex; align-items:baseline; gap:8px;">
-                        Score: ${data.scoreDisplay}, 
-                        <span style="font-weight:normal; font-size:0.7em; color:#555;">${data.tastedDate}</span>
-                    </div>
-                    
-                    <div style="font-size:0.9em; line-height:1.8;">
-                        ${badgeHtml}
-                    </div>
-                    
-                    <div style="font-size:9px; color:#ccc; margin-top:8px; text-transform:uppercase; letter-spacing:0.5px;">
-                        Profile: ${data.profileName}
-                    </div>
-                </div>
-            `;
+            // UNIFIED TEMPLATE via Helper
+            let combinedHtml = buildReportHtml(
+                data.ai_note, 
+                data.scoreDisplay, 
+                data.scoreBreakdown, 
+                data.tastedDate, 
+                data.profileName
+            );
 
             aiText.innerHTML = combinedHtml;
             aiBox.classList.add('visible');
