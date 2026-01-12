@@ -420,17 +420,14 @@
         document.getElementById('comm_lacks').value = d.comm_lacks || "";
         document.getElementById('comm_rem').value = d.comm_rem || "";
 
-        // --- UPDATED DISPLAY LOGIC ---
         const aiBox = document.getElementById('aiNoteBox');
         const aiText = document.getElementById('aiNoteText');
         
         let finalHtml = "";
 
         if (d.scoreBreakdown && d.scoreDisplay) {
-            // NEW FORMAT: Build it dynamically
+            // NEW RECORDS (Unified Template)
             let badgeHtml = renderScoreReport(d.scoreBreakdown);
-            
-            // Fallbacks for data
             let pName = d.profileName || "Burgundy EP"; 
             let tDate = d.tastedDate || ""; 
 
@@ -455,7 +452,7 @@
                 </div>
             `;
         } else if (d.ai_note) {
-            // OLD FORMAT: Note contains everything (Score + Badges baked in HTML)
+            // OLD RECORDS
             finalHtml = d.ai_note.replace(/\n/g, '<br>');
         }
 
@@ -466,6 +463,7 @@
             aiBox.classList.remove('visible');
         }
     }
+
 
 
     function getChecked(n) { return Array.from(document.querySelectorAll(`input[name="${n}"]:checked`)).map(c => c.value); }
@@ -500,8 +498,6 @@ function renderScoreReport(breakdownData) {
         const btn = document.getElementById('saveBtn');
         const ref = document.getElementById('wineRef').value;
         const sheet = document.getElementById('sheetSelector').value;
-        
-        // UI Elements for Feedback
         const aiBox = document.getElementById('aiNoteBox');
         const aiText = document.getElementById('aiNoteText');
         
@@ -515,8 +511,6 @@ function renderScoreReport(breakdownData) {
 
         btn.textContent = "AI GENERATING...";
         btn.disabled = true;
-        
-        // Optimistic UI: Show "Generating" 
         aiBox.classList.add('visible');
         aiText.innerHTML = "<i>Analyzing data & writing note...</i>";
 
@@ -548,67 +542,56 @@ function renderScoreReport(breakdownData) {
                 return;
             }
 
-            // --- NEW: RENDER VISUAL REPORT (Score + Badges + Note) ---
-            
-            // 1. Generate Badges HTML
-            // Note: data.scoreBreakdown comes from the new Backend we wrote
+            // UNIFIED TEMPLATE (Same as fillForm)
             let badgeHtml = renderScoreReport(data.scoreBreakdown);
-
-            // 2. Build Complete HTML Block
-              let combinedHtml = `
-                <div style="font-family:serif; font-size:1.1em; line-height:1.4; color:#333;">
+            let combinedHtml = `
+                <div style="font-family:serif; font-size:1.1em; line-height:1.4; color:#333; margin-bottom: 25px;">
                     ${data.ai_note}
                 </div>
-                <div style="margin-top:15px; padding-top:10px; border-top:1px solid #eee;">
-                    <div style="font-size:1.2em; font-weight:bold; margin-bottom:5px;">
-                        <span style="color:#444;">${data.profileName}</span> Score: ${data.scoreDisplay}, <span style="font-weight:normal; font-size:0.9em; color:#777;">${data.tastedDate}</span>
+                
+                <div style="font-family:-apple-system, sans-serif;">
+                    <div style="font-size:1.4em; font-weight:800; color:#2c3e50; margin-bottom:8px; display:flex; align-items:baseline; gap:8px;">
+                        Score: ${data.scoreDisplay}, 
+                        <span style="font-weight:normal; font-size:0.7em; color:#555;">${data.tastedDate}</span>
                     </div>
-                    <div style="font-size:0.85em; color:#666;">
+                    
+                    <div style="font-size:0.9em; line-height:1.8;">
                         ${badgeHtml}
+                    </div>
+                    
+                    <div style="font-size:9px; color:#ccc; margin-top:8px; text-transform:uppercase; letter-spacing:0.5px;">
+                        Profile: ${data.profileName}
                     </div>
                 </div>
             `;
 
-            // 3. Inject into UI
             aiText.innerHTML = combinedHtml;
             aiBox.classList.add('visible');
 
-            // --- END VISUAL REPORT ---
-
-            // 4. Handle Button State
             btn.textContent = isUpdating ? "UPDATED" : "SAVED";
             
-            // 5. Logic: Update vs New
             if (isUpdating) {
-                // CASE A: UPDATE -> STAY HERE
-                setTimeout(() => {
-                    btn.textContent = "UPDATE";
-                    btn.disabled = false;
-                }, 1000);
-                
-                // Update local cache
+                setTimeout(() => { btn.textContent = "UPDATE"; btn.disabled = false; }, 1000);
                 if (localData[currentIndex]) {
                     localData[currentIndex].ai_note = data.ai_note; 
                     localData[currentIndex].ref = ref;
-                    // Cache new fields too if you want them immediately available without reload
                     localData[currentIndex].scoreDisplay = data.scoreDisplay;
                     localData[currentIndex].scoreBreakdown = data.scoreBreakdown;
+                    localData[currentIndex].tastedDate = data.tastedDate; // Update Cache!
+                    localData[currentIndex].profileName = data.profileName; // Update Cache!
                 }
-
             } else {
-                // CASE B: NEW RECORD -> RESET
-                setTimeout(() => {
-                    loadSheetData(); 
-                }, 2000); 
+                setTimeout(() => { loadSheetData(); }, 2000); 
             }
         })
         .catch(e => {
             console.error(e);
-            alert("Network Error or CORS issue. Check Console.");
+            alert("Network Error. Check Console.");
             btn.textContent = "ERROR";
             btn.disabled = false;
         });
     }
+
 
 
     function deleteRecord() {
