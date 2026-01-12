@@ -399,8 +399,8 @@
         document.getElementById('nextBtn').disabled = true; 
     }
 
+    
     function fillForm(d) {
-        // ... (Inputs filling logic remains the same) ...
         document.getElementById('wineRef').value = d.ref || "";
         const check = (n, v) => {
             if(!v) return;
@@ -429,22 +429,33 @@
         if (d.scoreBreakdown && d.scoreDisplay) {
             // NEW FORMAT: Build it dynamically
             let badgeHtml = renderScoreReport(d.scoreBreakdown);
+            
+            // Fallbacks for data
+            let pName = d.profileName || "Burgundy EP"; 
+            let tDate = d.tastedDate || ""; 
+
             finalHtml = `
-                <div style="font-family:serif; font-size:1.1em; line-height:1.4; color:#333;">
+                <div style="font-family:serif; font-size:1.1em; line-height:1.4; color:#333; margin-bottom: 25px;">
                     ${d.ai_note}
                 </div>
-                <div style="margin-top:15px; padding-top:10px; border-top:1px solid #eee;">
-                    <div style="font-size:1.2em; font-weight:bold; margin-bottom:5px;">
-                        Score: ${d.scoreDisplay}
+                
+                <div style="font-family:-apple-system, sans-serif;">
+                    <div style="font-size:1.4em; font-weight:800; color:#2c3e50; margin-bottom:8px; display:flex; align-items:baseline; gap:8px;">
+                        Score: ${d.scoreDisplay}, 
+                        <span style="font-weight:normal; font-size:0.7em; color:#555;">${tDate}</span>
                     </div>
-                    <div style="font-size:0.85em; color:#666;">
+                    
+                    <div style="font-size:0.9em; line-height:1.8;">
                         ${badgeHtml}
+                    </div>
+                    
+                    <div style="font-size:9px; color:#ccc; margin-top:8px; text-transform:uppercase; letter-spacing:0.5px;">
+                        Profile: ${pName}
                     </div>
                 </div>
             `;
         } else if (d.ai_note) {
             // OLD FORMAT: Note contains everything (Score + Badges baked in HTML)
-            // Just replace newlines and show "As Is"
             finalHtml = d.ai_note.replace(/\n/g, '<br>');
         }
 
@@ -455,6 +466,7 @@
             aiBox.classList.remove('visible');
         }
     }
+
 
     function getChecked(n) { return Array.from(document.querySelectorAll(`input[name="${n}"]:checked`)).map(c => c.value); }
     function getRadio(n) { let el = document.querySelector(`input[name="${n}"]:checked`); return el ? el.value : ""; }
