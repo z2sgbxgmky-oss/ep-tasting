@@ -164,90 +164,114 @@
 
     </header>
 
-<!-- NOSE SECTION -->
-<div class="section-title">Nose</div>
-<div class="grid-3">
-    <!-- Flaws -->
-    <div class="group-box">
-        <div class="group-label flaw-label">Flaws</div>
-        <div id="container_nose_flaws"></div> <!-- Dynamic Target -->
+<!-- NOSE -->
+    <div class="section-header">Nose</div>
+    <div class="grid-3">
+        <div class="col col-flaws">
+            <div class="col-title">Flaws</div>
+            <label><input type="checkbox" name="nose_flaws" value="Nail Polish/Manure"> Nail Polish / Manure (VA / brett) </label>
+            <label><input type="checkbox" name="nose_flaws" value="Too Alcoholic"> Too Alcoholic</label>
+            <label><input type="checkbox" name="nose_flaws" value="Too Oaky"> Too Oaky (vanilla / cedar) </label>
+        </div>
+        <div class="col col-traits">
+            <div class="col-title">Traits</div>
+            <label><input type="checkbox" name="nose_traits" value="Sous-bois/Funk"> Sous-bois / Funk ('good' brett?) </label>
+            <label><input type="checkbox" name="nose_traits" value="Reduction/Sulphur"> Reduction / Sulphur (matches / flint) </label>
+            <label><input type="checkbox" name="nose_traits" value="Muted/Closed"> Muted / Closed</label>
+        </div>
+        <div class="col col-pros">
+            <div class="col-title">Pros</div>
+            <label><input type="checkbox" name="nose_pros" value="Powerful"> Powerful</label>
+            <label><input type="checkbox" name="nose_pros" value="Defined"> Defined</label>
+            <label><input type="checkbox" name="nose_pros" value="Complex"> Complex</label>
+        </div>
     </div>
-    <!-- Traits -->
-    <div class="group-box">
-        <div class="group-label trait-label">Traits</div>
-        <div id="container_nose_traits"></div> <!-- Dynamic Target -->
+
+    <!-- PALATE -->
+    <div class="section-header">Palate</div>
+    <div class="grid-3">
+        <div class="col col-flaws">
+            <div class="col-title">Flaws</div>
+            <label><input type="checkbox" name="palate_flaws" value="Weak/Dilute">Weak / Dilute</label>
+            <label><input type="checkbox" name="palate_flaws" value="Candied"> Candied</label>
+            <label><input type="checkbox" name="palate_flaws" value="Flabby"> Flabby</label>
+        </div>
+        <div class="col col-traits">
+            <div class="col-title">Traits</div>
+            <label><input type="checkbox" name="palate_traits" value="Stemmy/Vegetal"> Stemmy / Vegetal (full bunch)</label>
+            <label><input type="checkbox" name="palate_traits" value="Tightly wound"> Tightly Wound</label>
+            <label><input type="checkbox" name="palate_traits" value="Transparent/Ethereal"> Transparent / Ethereal</label>
+        </div>
+        <div class="col col-pros">
+            <div class="col-title">Pros</div>
+            <label><input type="checkbox" name="palate_pros" value="Rich/Dense"> Rich / Dense</label>
+            <label><input type="checkbox" name="palate_pros" value="Complex"> Complex</label>
+            <label><input type="checkbox" name="palate_pros" value="Precise"> Precise</label>
+        </div>
     </div>
-    <!-- Pros -->
-    <div class="group-box">
-        <div class="group-label pro-label">Pros</div>
-        <div id="container_nose_pros"></div> <!-- Dynamic Target -->
+
+    <!-- AFTERTASTE -->
+    <div class="section-header">Aftertaste</div>
+    <div class="grid-3">
+        <div class="col col-flaws">
+            <div class="col-title">Flaws</div>
+            <label><input type="checkbox" name="finish_flaws" value="Heat/Burn"> Heat / Burn</label>
+            <label><input type="checkbox" name="finish_flaws" value="Short/Clipped"> Short / Clipped</label>
+            <label><input type="checkbox" name="finish_flaws" value="Harsh/Rustic"> Harsh / Rustic</label>
+        </div>
+        <div class="col col-traits">
+            <div class="col-title">Traits</div>
+            <label><input type="checkbox" name="finish_traits" value="Integrated Tannin"> Tannins Already Integrated </label>
+            <label><input type="checkbox" name="finish_traits" value="Chalky/Mineral"> Chalky / Mineral Tannins</label>
+            <label><input type="checkbox" name="finish_traits" value="Saline/Racy"> Saline / Racy (as you want more)</label>
+        </div>
+        <div class="col col-pros">
+            <div class="col-title">Pros</div>
+            <label><input type="checkbox" name="finish_pros" value="Vivid+Long"> Vivid + Long</label>
+            <label><input type="checkbox" name="finish_pros" value="Complex/Expanding"> Complex / Expanding</label>
+            <label><input type="checkbox" name="finish_pros" value="Accented Note"> Accented Note (definition) </label>
+        </div>
     </div>
-</div>
 
 
-<!-- PALATE SECTION -->
-<div class="section-title">Palate</div>
-<div class="grid-3">
-    <div class="group-box">
-        <div class="group-label flaw-label">Flaws</div>
-        <div id="container_palate_flaws"></div>
-    </div>
-    <div class="group-box">
-        <div class="group-label trait-label">Traits</div>
-        <div id="container_palate_traits"></div>
-    </div>
-    <div class="group-box">
-        <div class="group-label pro-label">Pros</div>
-        <div id="container_palate_pros"></div>
-    </div>
-</div>
 
-    <!-- AFTERTASTE SECTION -->
-<div class="section-title">Aftertaste</div>
-<div class="grid-3">
-    <div class="group-box">
-        <div class="group-label flaw-label">Flaws</div>
-        <div id="container_finish_flaws"></div>
-    </div>
-    <div class="group-box">
-        <div class="group-label trait-label">Traits</div>
-        <div id="container_finish_traits"></div>
-    </div>
-    <div class="group-box">
-        <div class="group-label pro-label">Pros</div>
-        <div id="container_finish_pros"></div>
-    </div>
-</div>
-
-
-    <!-- GENERAL & COMMENTS (Dynamic Targets) -->
+    <!-- GENERAL & COMMENTS -->
     <div class="general-grid" style="margin-top:20px;">
-        
-        <!-- Balance (Dynamic) -->
         <div class="gen-item">
             <h3>Balance</h3>
-            <div class="pill-group" id="container_balance"></div>
+            <div class="pill-group">
+                <input type="radio" name="balance" value="Disjointed" id="b1" class="pill-radio"><label for="b1" class="pill-label">Disjointed</label>
+                <input type="radio" name="balance" value="Structured" id="b2" class="pill-radio"><label for="b2" class="pill-label">Structured</label>
+                <input type="radio" name="balance" value="Forward" id="b3" class="pill-radio"><label for="b3" class="pill-label">Forward</label>
+                <input type="radio" name="balance" value="Loose" id="b4" class="pill-radio"><label for="b4" class="pill-label">Loose</label>
+            </div>
         </div>
-        
-        <!-- Profile (Dynamic) -->
         <div class="gen-item">
             <h3>Profile</h3>
-            <div class="pill-group" id="container_profile"></div>
+            <div class="pill-group">
+                <input type="radio" name="profile" value="Red" id="p1" class="pill-radio"><label for="p1" class="pill-label">Red</label>
+                <input type="radio" name="profile" value="Blue" id="p2" class="pill-radio"><label for="p2" class="pill-label">Blue</label>
+                <input type="radio" name="profile" value="Black" id="p3" class="pill-radio"><label for="p3" class="pill-label">Black</label>
+                <input type="radio" name="profile" value="Cooked" id="p4" class="pill-radio"><label for="p4" class="pill-label">Cooked</label>
+            </div>
         </div>
-        
-        <!-- True To (Dynamic) -->
         <div class="gen-item">
             <h3>True To</h3>
-            <div class="pill-group" id="container_true_to"></div>
+            <div class="pill-group">
+                <label style="flex:auto; font-size:0.7rem;"><input type="checkbox" name="true_to" value="Terroir"> Terroir</label>
+                <label style="flex:auto; font-size:0.7rem;"><input type="checkbox" name="true_to" value="Producer"> Producer</label>
+                <label style="flex:auto; font-size:0.7rem;"><input type="checkbox" name="true_to" value="Vintage"> Vintage</label>
+            </div>
         </div>
     </div>
 
-    <!-- COMMENTS (Static - Keep as is) -->
     <div class="comment-grid">
         <div class="comment-box"><span>Too...</span><input type="text" id="comm_too"></div>
         <div class="comment-box"><span>Lacks...</span><input type="text" id="comm_lacks"></div>
         <div class="comment-box"><span>Remarkable...</span><input type="text" id="comm_rem"></div>
     </div>
+
+</div>
 
 <!-- COMPACT FOOTER -->
 <div class="footer-control">
@@ -260,107 +284,13 @@
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwvhb_OSlNid4L39wJ0oiqo7tkCkhQ2U103i9V0N7r25pdJB8Ioj19YPOu2oHtR7YiU/exec";
-  
+
     let localData = [];
     let currentIndex = -1; 
     let isUpdating = false;
 
     window.onload = function() { fetchSheets(); };
 
-// --- DEFAULT PROFILE CONFIG ---
-// Eventually this will come from the backend!
-const DEFAULT_PROFILE = {
-    name: "Burgundy En Primeur",
-    nose: {
-        flaws: ["Nail Polish / Manure", "Too Alcoholic", "Too Oaky"],
-        traits: ["Sous-bois / Funk", "Reduction / Sulphur", "Muted / Closed"],
-        pros: ["Powerful", "Defined", "Complex"]
-    },
-    palate: {
-        flaws: ["Weak / Dilute", "Candied", "Flabby"],
-        traits: ["Stemmy / Vegetal", "Tightly Wound", "Transparent"],
-        pros: ["Rich / Dense", "Complex", "Precise"]
-    },
-    finish: {
-        flaws: ["Heat / Burn", "Short / Clipped", "Harsh / Rustic"],
-        traits: ["Tannins Integrated", "Chalky / Mineral", "Saline / Racy"],
-        pros: ["Vivid + Long", "Complex / Expanding", "Accented Note"]
-    },
-    balance: ["Disjointed", "Structured", "Forward", "Loose"],
-    profile: ["Red", "Blue", "Black", "Cooked"],
-    true_to: ["Terroir", "Producer", "Vintage"]
-};
-
-let currentProfile = DEFAULT_PROFILE; // Active config
-
-
-function renderProfileForm(config) {
-    // 1. Helper for Standard Checkboxes (Nose/Palate/Finish)
-    const mkCheck = (group, name) => `
-        <label><input type="checkbox" name="${group}" value="${name}"> ${name}</label>
-    `;
-    
-    // 2. Helper for PILL RADIOS (Balance/Profile)
-    // Needs unique IDs (e.g. bal_Disjointed) for the label 'for' attribute to work
-    const mkPillRadio = (group, name) => {
-        const id = group + "_" + name.replace(/[^a-zA-Z0-9]/g, ''); // Sanitized ID
-        return `
-            <input type="radio" name="${group}" value="${name}" id="${id}" class="pill-radio">
-            <label for="${id}" class="pill-label">${name}</label>
-        `;
-    };
-
-    // 3. Helper for PILL CHECKBOXES (True To)
-    // Preserving your style="flex:auto; font-size:0.7rem;"
-    const mkPillCheck = (group, name) => `
-        <label style="flex:auto; font-size:0.7rem;">
-            <input type="checkbox" name="${group}" value="${name}"> ${name}
-        </label>
-    `;
-
-    // --- RENDER SECTIONS ---
-    
-    // A. Main Sections (Standard Lists)
-    ['nose', 'palate', 'finish'].forEach(section => {
-        ['flaws', 'traits', 'pros'].forEach(type => {
-            const container = document.getElementById(`container_${section}_${type}`);
-            if(container && config[section] && config[section][type]) {
-                container.innerHTML = config[section][type]
-                    .map(item => mkCheck(`${section}_${type}`, item))
-                    .join('');
-            }
-        });
-    });
-
-    // B. Balance (Pill Radios)
-    const balContainer = document.getElementById('container_balance');
-    if(balContainer && config.balance) {
-        balContainer.innerHTML = config.balance
-            .map(item => mkPillRadio('balance', item))
-            .join('');
-    }
-
-    // C. Profile (Pill Radios)
-    const profContainer = document.getElementById('container_profile');
-    if(profContainer && config.profile) {
-        profContainer.innerHTML = config.profile
-            .map(item => mkPillRadio('profile', item))
-            .join('');
-    }
-
-    // D. True To (Pill-like Checkboxes)
-    const trueContainer = document.getElementById('container_true_to');
-    if(trueContainer && config.true_to) {
-        trueContainer.innerHTML = config.true_to
-            .map(item => mkPillCheck('true_to', item))
-            .join('');
-    }
-    
-    console.log("Form Rendered with Profile:", config.name);
-}
-
-    
-    
     function fetchSheets() {
         const sel = document.getElementById('sheetSelector');
         fetch(`${SCRIPT_URL}?action=getSheets`)
