@@ -52,6 +52,18 @@
             cursor: pointer;
         }
 
+        .profile-dropdown {
+            flex-grow: 1;
+            font-size: 1.1rem; /* Increased from 0.9rem */
+            font-weight: 800;  /* Increased from 700 to match header */
+            color: #4a5568;    /* Darker grey for more presence */
+            border: none;
+            background: transparent;
+            padding: 10px 0;   /* More breathing room vertically */
+            cursor: pointer;
+            text-transform: capitalize; /* Cleaner look */
+        }
+
         .btn-add-sheet {
             background: transparent;
             border: 1px solid var(--burgundy);
@@ -65,6 +77,22 @@
             padding-bottom: 2px;
         }
 
+        .btn-add-profile {
+            background: transparent;
+            border: 1px solid #718096;
+            color: #718096;
+            border-radius: 50%;
+            width: 22px; 
+            height: 22px;
+            font-size: 1rem;
+            line-height: 1;
+            cursor: pointer;
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            padding-bottom: 2px;
+        }
+
         .wine-input {
             padding: 10px;
             border: 2px solid #e2e8f0;
@@ -74,20 +102,6 @@
             font-weight: 600;
             color: #2d3748;
             box-sizing: border-box;
-            margin-top: 5px;
-        }
-
-        /* DYNAMIC PROFILE SELECTOR */
-        .profile-select {
-            padding: 10px;
-            font-weight: 600;
-            border: 2px solid #e2e8f0;
-            border-radius: 6px;
-            background: #fff;
-            font-size: 0.9rem;
-            color: #2d3748;
-            height: 46px;
-            width: 100%;
             margin-top: 5px;
         }
 
@@ -163,40 +177,44 @@
             <button class="btn-add-sheet" onclick="createNewSheet()">+</button>
         </div>
         
-        <div style="display: flex; gap: 8px; align-items: center;">
-            <input type="text" id="wineRef" class="wine-input" placeholder="Wine Name / Reference" style="flex: 2; margin-top:0;">
-            <select id="profileSelector" class="profile-select" onchange="handleProfileChange()" style="flex: 1;">
-                <option>Loading Profiles...</option>
-            </select>
-        </div>
+        <input type="text" id="wineRef" class="wine-input" placeholder="Wine Name / Reference" style="margin-top:8px;">
         
         <div id="aiNoteBox" class="ai-note-box">
             <div id="aiNoteText">Generating...</div>
         </div>
+
+        <div class="header-row" style="margin-top:25px; margin-bottom: 0px; border-bottom: 2px solid #edf2f7; padding-bottom: 5px;">
+            <select id="profileSelector" class="profile-dropdown" onchange="handleProfileChange()">
+                <option>Loading Profiles...</option>
+            </select>
+            <button class="btn-add-profile" onclick="openProfileDesigner()">+</button>
+        </div>
+        
     </header>
+
 
     <!-- NOSE (Dynamic Containers) -->
     <div class="section-header">Nose</div>
     <div class="grid-3" id="nose_section">
-        <div class="group-box"><div class="group-label">Flaws</div><div id="container_nose_flaws"></div></div>
-        <div class="group-box"><div class="group-label">Traits</div><div id="container_nose_traits"></div></div>
-        <div class="group-box"><div class="group-label">Pros</div><div id="container_nose_pros"></div></div>
+        <div class="group-box"><div class="group-label"></div><div id="container_nose_flaws"></div></div>
+        <div class="group-box"><div class="group-label"></div><div id="container_nose_traits"></div></div>
+        <div class="group-box"><div class="group-label"></div><div id="container_nose_pros"></div></div>
     </div>
 
     <!-- PALATE (Dynamic Containers) -->
     <div class="section-header">Palate</div>
     <div class="grid-3" id="palate_section">
-        <div class="group-box"><div class="group-label">Flaws</div><div id="container_palate_flaws"></div></div>
-        <div class="group-box"><div class="group-label">Traits</div><div id="container_palate_traits"></div></div>
-        <div class="group-box"><div class="group-label">Pros</div><div id="container_palate_pros"></div></div>
+        <div class="group-box"><div class="group-label"></div><div id="container_palate_flaws"></div></div>
+        <div class="group-box"><div class="group-label"></div><div id="container_palate_traits"></div></div>
+        <div class="group-box"><div class="group-label"></div><div id="container_palate_pros"></div></div>
     </div>
 
     <!-- FINISH (Dynamic Containers) -->
     <div class="section-header">Aftertaste</div>
     <div class="grid-3" id="finish_section">
-        <div class="group-box"><div class="group-label">Flaws</div><div id="container_finish_flaws"></div></div>
-        <div class="group-box"><div class="group-label">Traits</div><div id="container_finish_traits"></div></div>
-        <div class="group-box"><div class="group-label">Pros</div><div id="container_finish_pros"></div></div>
+        <div class="group-box"><div class="group-label"></div><div id="container_finish_flaws"></div></div>
+        <div class="group-box"><div class="group-label"></div><div id="container_finish_traits"></div></div>
+        <div class="group-box"><div class="group-label"></div><div id="container_finish_pros"></div></div>
     </div>
 
     <!-- GENERAL & COMMENTS -->
@@ -319,11 +337,12 @@
                     if(type === 'traits') parentBox.classList.add('col-traits');
                     if(type === 'pros') parentBox.classList.add('col-pros');
                     
-                    if(!parentBox.querySelector('.col-title')) {
-                        const title = document.createElement('div');
-                        title.className = 'col-title';
+                    const title = parentBox.querySelector('.group-label');
+                    if(title) {
+                        // Apply the fancy style class
+                        title.className = 'col-title'; 
+                        // Inject the text (e.g., "Flaws")
                         title.innerText = type.charAt(0).toUpperCase() + type.slice(1);
-                        parentBox.insertBefore(title, container);
                     }
                 }
             });
@@ -475,7 +494,12 @@
         btn.classList.remove('update');
         btn.disabled = false;
         document.getElementById('aiNoteBox').classList.remove('visible');
+        
+        // NEW: Disable Next button (no record to navigate to)
+        document.getElementById('nextBtn').disabled = true;
+        document.getElementById('prevBtn').disabled = false;
     }
+
 
     function getChecked(n) { return Array.from(document.querySelectorAll(`input[name="${n}"]:checked`)).map(c => c.value); }
     function getRadio(n) { let el = document.querySelector(`input[name="${n}"]:checked`); return el ? el.value : ""; }
@@ -562,6 +586,12 @@
             <div style="font-size:9px; color:#ccc; margin-top:12px; text-transform:uppercase; letter-spacing:0.5px;">Profile: ${profile||"Unknown"}</div>
         </div>`;
     }
+
+    function openProfileDesigner() {
+        alert("Profile Designer (Coming Soon)");
+    }
+
+
 </script>
 
 </body>
