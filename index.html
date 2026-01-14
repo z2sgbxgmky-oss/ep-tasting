@@ -51,7 +51,6 @@
             padding: 5px 0;
             cursor: pointer;
         }
-        .sheet-dropdown:focus { outline: none; }
 
         .btn-add-sheet {
             background: transparent;
@@ -77,44 +76,49 @@
             box-sizing: border-box;
             margin-top: 5px;
         }
-        .wine-input:focus { border-color: var(--burgundy); outline: none; }
 
-        
-/* REPORT BADGES */
-.report-badge { display: inline-block; padding: 1px 6px; margin: 0 4px 3px 0; border-radius: 4px; font-family: sans-serif; font-size: 10px; border: 1px solid transparent; }
-.badge-pro { border-color: #a5d6a7; background-color: #e8f5e9; color: #1b5e20; }
-.badge-flaw { border-color: #ef9a9a; background-color: #ffebee; color: #b71c1c; }
-.badge-trait { border-color: #90caf9; background-color: #e3f2fd; color: #0d47a1; }
-.badge-info { border-color: #bdbdbd; background-color: #f5f5f5; color: #616161; }
-.badge-neutral { border-color: #bdbdbd; background-color: #f5f5f5; color: #757575; text-decoration: line-through; }
-.report-spacer { display: block; height: 4px; }
+        /* DYNAMIC PROFILE SELECTOR */
+        .profile-select {
+            padding: 10px;
+            font-weight: 600;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            background: #fff;
+            font-size: 0.9rem;
+            color: #2d3748;
+            height: 46px;
+            width: 100%;
+            margin-top: 5px;
+        }
 
-        
+        /* REPORT BADGES */
+        .report-badge { display: inline-block; padding: 1px 6px; margin: 0 4px 3px 0; border-radius: 4px; font-family: sans-serif; font-size: 10px; border: 1px solid transparent; }
+        .badge-pro { border-color: #a5d6a7; background-color: #e8f5e9; color: #1b5e20; }
+        .badge-flaw { border-color: #ef9a9a; background-color: #ffebee; color: #b71c1c; }
+        .badge-trait { border-color: #90caf9; background-color: #e3f2fd; color: #0d47a1; }
+        .badge-info { border-color: #bdbdbd; background-color: #f5f5f5; color: #616161; }
+        .badge-neutral { border-color: #bdbdbd; background-color: #f5f5f5; color: #757575; text-decoration: line-through; }
+        .report-spacer { display: block; height: 4px; }
+
         /* AI NOTE BOX */
-.ai-note-box {
-    background: transparent;  /* No background color */
-    border: none;             /* No frame/border */
-    padding: 10px 0;          /* Just vertical spacing */
-    margin-top: 5px;
-    font-size: 0.9rem;        /* Normal readable size */
-    color: #2d3748;           /* Dark grey text */
-    line-height: 1.2;
-    display: none;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
-
-.ai-note-box.visible { 
-    display: block; 
-}
-
-/* Hide the label completely per instructions */
-.ai-label { 
-    display: none; 
-}
+        .ai-note-box {
+            background: transparent;
+            border: none;
+            padding: 10px 0;
+            margin-top: 5px;
+            font-size: 0.9rem;
+            color: #2d3748;
+            line-height: 1.2;
+            display: none;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        .ai-note-box.visible { display: block; }
+        .ai-label { display: none; }
 
         .section-header { font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #a0aec0; border-bottom: 1px solid #edf2f7; margin: 10px 0 8px 0; }
-        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
-        @media (max-width: 700px) { .grid-3 { grid-template-columns: 1fr; } }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; transition: opacity 0.2s; }
+        @media (max-width: 700px) { .grid-3 { grid-template-columns: 1fr; margin-bottom: 20px; } }
+        
         .col { padding: 8px; border-radius: 6px; display: flex; flex-direction: column; gap: 6px; border-width: 1px; border-style: solid; }
         .col-flaws { background: var(--flaw-bg); border-color: var(--flaw-border); }
         .col-traits { background: var(--trait-bg); border-color: var(--trait-border); }
@@ -123,17 +127,21 @@
         .col-flaws .col-title { color: var(--flaw-text); }
         .col-traits .col-title { color: var(--trait-text); }
         .col-pros .col-title { color: var(--pro-text); }
+        
         label { display: flex; align-items: center; font-size: 0.85rem; cursor: pointer; font-weight: 500; }
         input[type="checkbox"] { margin-right: 8px; accent-color: var(--burgundy); width: 18px; height: 18px; flex-shrink: 0; }
+        
         .general-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: #f7fafc; padding: 8px; border-radius: 8px; border: 1px solid #edf2f7; }
         .gen-item h3 { font-size: 0.65rem; margin: 0 0 4px 0; color: #718096; text-transform: uppercase; font-weight: 700; }
         .pill-group { display: flex; flex-wrap: wrap; gap: 3px; }
         .pill-label { padding: 4px 6px; background: #e2e8f0; border-radius: 10px; font-size: 0.7rem; cursor: pointer; font-weight: 600; color: #4a5568; flex: 1; text-align: center; }
         .pill-radio { display: none; }
         .pill-radio:checked + .pill-label { background: var(--burgundy); color: white; }
+        
         .comment-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 10px; }
         .comment-box span { font-size: 0.65rem; font-weight: 700; color: #718096; text-transform: uppercase; }
         .comment-box input { padding: 6px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 0.85rem; width: 100%; box-sizing: border-box; }
+        
         .footer-control { position: fixed; bottom: 0; left: 0; width: 100%; background: white; border-top: 1px solid #ddd; display: grid; grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr 0.8fr; height: 60px; z-index: 1000; }
         .ft-btn { background: white; border: none; border-left: 1px solid #eee; font-size: 1.2rem; cursor: pointer; color: #4a5568; display: flex; justify-content: center; align-items: center; font-weight: 700; padding: 0; transition: background 0.2s; }
         .ft-btn:active { background: #f7fafc; }
@@ -150,106 +158,70 @@
     <header>
         <div class="header-row">
             <select id="sheetSelector" class="sheet-dropdown" onchange="loadSheetData()">
-                <option>Loading...</option>
+                <option>Loading Sheets...</option>
             </select>
             <button class="btn-add-sheet" onclick="createNewSheet()">+</button>
         </div>
-        <input type="text" id="wineRef" class="wine-input" placeholder="Wine Name / Reference">
         
-        <!-- AI NOTE DISPLAY -->
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="text" id="wineRef" class="wine-input" placeholder="Wine Name / Reference" style="flex: 2; margin-top:0;">
+            <select id="profileSelector" class="profile-select" onchange="handleProfileChange()" style="flex: 1;">
+                <option>Loading Profiles...</option>
+            </select>
+        </div>
+        
         <div id="aiNoteBox" class="ai-note-box">
-            <span class="ai-label">AI Tasting Note</span>
             <div id="aiNoteText">Generating...</div>
         </div>
-
     </header>
 
-<!-- NOSE SECTION -->
-<div class="section-title">Nose</div>
-<div class="grid-3">
-    <!-- Flaws -->
-    <div class="group-box">
-        <div class="group-label flaw-label">Flaws</div>
-        <div id="container_nose_flaws"></div> <!-- Dynamic Target -->
+    <!-- NOSE (Dynamic Containers) -->
+    <div class="section-header">Nose</div>
+    <div class="grid-3" id="nose_section">
+        <div class="group-box"><div class="group-label">Flaws</div><div id="container_nose_flaws"></div></div>
+        <div class="group-box"><div class="group-label">Traits</div><div id="container_nose_traits"></div></div>
+        <div class="group-box"><div class="group-label">Pros</div><div id="container_nose_pros"></div></div>
     </div>
-    <!-- Traits -->
-    <div class="group-box">
-        <div class="group-label trait-label">Traits</div>
-        <div id="container_nose_traits"></div> <!-- Dynamic Target -->
-    </div>
-    <!-- Pros -->
-    <div class="group-box">
-        <div class="group-label pro-label">Pros</div>
-        <div id="container_nose_pros"></div> <!-- Dynamic Target -->
-    </div>
-</div>
 
+    <!-- PALATE (Dynamic Containers) -->
+    <div class="section-header">Palate</div>
+    <div class="grid-3" id="palate_section">
+        <div class="group-box"><div class="group-label">Flaws</div><div id="container_palate_flaws"></div></div>
+        <div class="group-box"><div class="group-label">Traits</div><div id="container_palate_traits"></div></div>
+        <div class="group-box"><div class="group-label">Pros</div><div id="container_palate_pros"></div></div>
+    </div>
 
-<!-- PALATE SECTION -->
-<div class="section-title">Palate</div>
-<div class="grid-3">
-    <div class="group-box">
-        <div class="group-label flaw-label">Flaws</div>
-        <div id="container_palate_flaws"></div>
+    <!-- FINISH (Dynamic Containers) -->
+    <div class="section-header">Aftertaste</div>
+    <div class="grid-3" id="finish_section">
+        <div class="group-box"><div class="group-label">Flaws</div><div id="container_finish_flaws"></div></div>
+        <div class="group-box"><div class="group-label">Traits</div><div id="container_finish_traits"></div></div>
+        <div class="group-box"><div class="group-label">Pros</div><div id="container_finish_pros"></div></div>
     </div>
-    <div class="group-box">
-        <div class="group-label trait-label">Traits</div>
-        <div id="container_palate_traits"></div>
-    </div>
-    <div class="group-box">
-        <div class="group-label pro-label">Pros</div>
-        <div id="container_palate_pros"></div>
-    </div>
-</div>
 
-    <!-- AFTERTASTE SECTION -->
-<div class="section-title">Aftertaste</div>
-<div class="grid-3">
-    <div class="group-box">
-        <div class="group-label flaw-label">Flaws</div>
-        <div id="container_finish_flaws"></div>
-    </div>
-    <div class="group-box">
-        <div class="group-label trait-label">Traits</div>
-        <div id="container_finish_traits"></div>
-    </div>
-    <div class="group-box">
-        <div class="group-label pro-label">Pros</div>
-        <div id="container_finish_pros"></div>
-    </div>
-</div>
-
-
-    <!-- GENERAL & COMMENTS (Dynamic Targets) -->
+    <!-- GENERAL & COMMENTS -->
     <div class="general-grid" style="margin-top:20px;">
-        
-        <!-- Balance (Dynamic) -->
         <div class="gen-item">
             <h3>Balance</h3>
             <div class="pill-group" id="container_balance"></div>
         </div>
-        
-        <!-- Profile (Dynamic) -->
         <div class="gen-item">
             <h3>Profile</h3>
             <div class="pill-group" id="container_profile"></div>
         </div>
-        
-        <!-- True To (Dynamic) -->
         <div class="gen-item">
             <h3>True To</h3>
             <div class="pill-group" id="container_true_to"></div>
         </div>
     </div>
 
-    <!-- COMMENTS (Static - Keep as is) -->
     <div class="comment-grid">
         <div class="comment-box"><span>Too...</span><input type="text" id="comm_too"></div>
         <div class="comment-box"><span>Lacks...</span><input type="text" id="comm_lacks"></div>
         <div class="comment-box"><span>Remarkable...</span><input type="text" id="comm_rem"></div>
     </div>
+</div>
 
-<!-- COMPACT FOOTER -->
 <div class="footer-control">
     <button id="saveBtn" class="ft-btn btn-save" onclick="submitData()">SAVE</button>
     <button class="ft-btn" onclick="resetForm()">+</button>
@@ -265,91 +237,178 @@
     let currentIndex = -1; 
     let isUpdating = false;
 
-window.onload = function() { 
-    renderProfileForm(currentProfile); // DRAW THE FORM FIRST!
-    fetchSheets(); 
-};
-
-// --- DEFAULT PROFILE CONFIG ---
-// Eventually this will come from the backend!
-const DEFAULT_PROFILE = {
-    name: "Burgundy En Primeur",
-    nose: {
-        flaws: ["Nail Polish / Manure", "Too Alcoholic", "Too Oaky"],
-        traits: ["Sous-bois / Funk", "Reduction / Sulphur", "Muted / Closed"],
-        pros: ["Powerful", "Defined", "Complex"]
-    },
-    palate: {
-        flaws: ["Weak / Dilute", "Candied", "Flabby"],
-        traits: ["Stemmy / Vegetal", "Tightly Wound", "Transparent"],
-        pros: ["Rich / Dense", "Complex", "Precise"]
-    },
-    finish: {
-        flaws: ["Heat / Burn", "Short / Clipped", "Harsh / Rustic"],
-        traits: ["Tannins Integrated", "Chalky / Mineral", "Saline / Racy"],
-        pros: ["Vivid + Long", "Complex / Expanding", "Accented Note"]
-    },
-    balance: ["Disjointed", "Structured", "Forward", "Loose"],
-    profile: ["Red", "Blue", "Black", "Cooked"],
-    true_to: ["Terroir", "Producer", "Vintage"]
-};
-
-let currentProfile = DEFAULT_PROFILE; // Active config
-
-
-function renderProfileForm(config) {
-    if(!config) { console.error("No config passed to renderProfileForm"); return; }
-
-    const mkCheck = (group, name) => `<label><input type="checkbox" name="${group}" value="${name}"> ${name}</label>`;
-    
-    const mkPillRadio = (group, name) => {
-        const safeId = group + "_" + name.replace(/[^a-zA-Z0-9]/g, ''); 
-        return `<input type="radio" name="${group}" value="${name}" id="${safeId}" class="pill-radio"><label for="${safeId}" class="pill-label">${name}</label>`;
+    // --- 1. INITIALIZATION CHAIN ---
+    // We strictly load Sheets -> Profiles -> Select First Profile -> Render.
+    window.onload = function() { 
+        fetchSheets(); 
+        loadProfilesList(); 
     };
 
-    const mkPillCheck = (group, name) => `<label style="flex:auto; font-size:0.7rem;"><input type="checkbox" name="${group}" value="${name}"> ${name}</label>`;
-
-    // Render Main Sections (Nose, Palate, Finish)
-    const sections = ['nose', 'palate', 'finish'];
-    const types = ['flaws', 'traits', 'pros'];
-
-    sections.forEach(sec => {
-        types.forEach(type => {
-            const container = document.getElementById(`container_${sec}_${type}`);
+    function loadProfilesList() {
+        fetch(`${SCRIPT_URL}?action=getProfilesList`)
+        .then(r => r.json())
+        .then(data => {
+            const sel = document.getElementById("profileSelector");
+            sel.innerHTML = "";
             
-            if(container && config[sec] && config[sec][type]) {
-                // 1. Inject Checkboxes
-                container.innerHTML = config[sec][type].map(val => mkCheck(`${sec}_${type}`, val)).join('');
+            if (data.profiles && data.profiles.length > 0) {
+                data.profiles.forEach(name => {
+                    let opt = document.createElement("option");
+                    // Backend sends "Name (Default)" -> We display exactly that.
+                    // We value exactly that. No stripping. Simple.
+                    // If the wine data matches this string, good. If not, we handle it.
+                    opt.value = name; 
+                    opt.text = name; 
+                    sel.appendChild(opt);
+                });
+                // Once list is populated, force load the first one.
+                handleProfileChange();
+            }
+        });
+    }
 
-                // 2. Apply CSS Classes to Parent Container (Restores Colors/Borders)
-                const parentBox = container.closest('.group-box');
-                if(parentBox) {
-                    parentBox.classList.add('col'); 
+    // --- 2. PROFILE CHANGE & RENDERING ---
+    function handleProfileChange() {
+        const name = document.getElementById("profileSelector").value;
+        if(!name) return;
+
+        // Visual Feedback
+        document.querySelectorAll('.grid-3').forEach(el => el.style.opacity = '0.4');
+
+        fetch(`${SCRIPT_URL}?action=getProfile&name=${encodeURIComponent(name)}`)
+        .then(r => r.json())
+        .then(config => {
+            renderProfileForm(config);
+            // Once rendered, if we are viewing a wine, re-apply checks.
+            if(currentIndex !== -1 && localData[currentIndex]) {
+                populateCheckboxes(localData[currentIndex]);
+            }
+            document.querySelectorAll('.grid-3').forEach(el => el.style.opacity = '1');
+        });
+    }
+
+     function renderProfileForm(config) {
+        if(!config || !config.nose) return;
+
+        // 1. Standard Checkbox Helper (for Nose/Palate/Finish)
+        const mkCheck = (group, name) => `<label><input type="checkbox" name="${group}" value="${name}"> ${name}</label>`;
+
+        // 2. Pill Radio Helper (for Profile - Single Select)
+        const mkPillRadio = (group, name) => {
+            const safeId = group + "_" + name.replace(/[^a-zA-Z0-9]/g, ''); 
+            return `<input type="radio" name="${group}" value="${name}" id="${safeId}" class="pill-radio"><label for="${safeId}" class="pill-label">${name}</label>`;
+        };
+
+        // 3. Pill Checkbox Helper (for Balance & True To - Multi Select)
+        // Re-uses the 'pill-radio' class so existing CSS (.pill-radio:checked + .pill-label) applies automatically
+        const mkPillCheckbox = (group, name) => {
+             const safeId = group + "_" + name.replace(/[^a-zA-Z0-9]/g, ''); 
+             return `<input type="checkbox" name="${group}" value="${name}" id="${safeId}" class="pill-radio"><label for="${safeId}" class="pill-label">${name}</label>`;
+        };
+
+        // --- Render Main Sections ---
+        ['nose', 'palate', 'finish'].forEach(sec => {
+            ['flaws', 'traits', 'pros'].forEach(type => {
+                const container = document.getElementById(`container_${sec}_${type}`);
+                if(container && config[sec] && config[sec][type]) {
+                    container.innerHTML = config[sec][type].map(val => mkCheck(`${sec}_${type}`, val)).join('');
+                    
+                    const parentBox = container.parentElement; 
+                    parentBox.className = 'group-box col'; 
                     if(type === 'flaws') parentBox.classList.add('col-flaws');
                     if(type === 'traits') parentBox.classList.add('col-traits');
                     if(type === 'pros') parentBox.classList.add('col-pros');
+                    
+                    if(!parentBox.querySelector('.col-title')) {
+                        const title = document.createElement('div');
+                        title.className = 'col-title';
+                        title.innerText = type.charAt(0).toUpperCase() + type.slice(1);
+                        parentBox.insertBefore(title, container);
+                    }
                 }
-            }
+            });
         });
-    });
 
-    // Render Balance
-    const balEl = document.getElementById('container_balance');
-    if(balEl && config.balance) balEl.innerHTML = config.balance.map(v => mkPillRadio('balance', v)).join('');
+        // --- Render Control Panel Sections ---
 
-    // Render Profile
-    const profEl = document.getElementById('container_profile');
-    if(profEl && config.profile) profEl.innerHTML = config.profile.map(v => mkPillRadio('profile', v)).join('');
+        // BALANCE: Pills (Multi-Select)
+        const balEl = document.getElementById('container_balance');
+        if(balEl && config.balance) balEl.innerHTML = config.balance.map(v => mkPillCheckbox('balance', v)).join('');
 
-    // Render True To
-    const trueEl = document.getElementById('container_true_to');
-    if(trueEl && config.true_to) trueEl.innerHTML = config.true_to.map(v => mkPillCheck('true_to', v)).join('');
-    
-    console.log("Render Complete.");
-}
+        // PROFILE: Pills (Single-Select)
+        const profEl = document.getElementById('container_profile');
+        if(profEl && config.profile) profEl.innerHTML = config.profile.map(v => mkPillRadio('profile', v)).join('');
 
-    
-    
+        // TRUE TO: Pills (Multi-Select)
+        const trueEl = document.getElementById('container_true_to');
+        if(trueEl && config.true_to) trueEl.innerHTML = config.true_to.map(v => mkPillCheckbox('true_to', v)).join('');
+    }
+
+
+    // --- 3. WINE DATA HANDLING ---
+    function fillForm(d) {
+        // 1. Fill Text
+        document.getElementById('wineRef').value = d.ref || "";
+        document.getElementById('comm_too').value = d.comm_too || "";
+        document.getElementById('comm_lacks').value = d.comm_lacks || "";
+        document.getElementById('comm_rem').value = d.comm_rem || "";
+
+        // 2. Profile Logic
+        const currentSel = document.getElementById('profileSelector');
+        const wineProfile = d.profileName; // e.g. "Red Burgundy"
+
+        // Logic: If the wine has a profile, and it is NOT what is currently selected...
+        // We must switch.
+        if (wineProfile && currentSel.value !== wineProfile) {
+            // Check if the dropdown actually HAS this option
+            let optionExists = Array.from(currentSel.options).some(o => o.value === wineProfile);
+            
+            if (optionExists) {
+                currentSel.value = wineProfile;
+                handleProfileChange(); // This will fetch, render, then populate checkboxes
+            } else {
+                // Edge case: Wine has a profile that isn't in the list? 
+                // Just keep current, or try to fallback.
+                console.warn("Profile not found in list:", wineProfile);
+                populateCheckboxes(d);
+            }
+        } else {
+            // Profile matches (or wine has none), just fill checkboxes
+            populateCheckboxes(d);
+        }
+
+        // 3. AI Note Display
+        const aiBox = document.getElementById('aiNoteBox');
+        const aiText = document.getElementById('aiNoteText');
+        let html = buildReportHtml(d.ai_note, d.scoreDisplay, d.scoreBreakdown, d.tastedDate, d.profileName);
+        
+        if(html) { aiText.innerHTML = html; aiBox.classList.add('visible'); } 
+        else { aiBox.classList.remove('visible'); }
+    }
+
+    function populateCheckboxes(d) {
+        // Clear all first
+        document.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
+        document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+
+        const check = (n, v) => {
+            if(!v) return;
+            const arr = Array.isArray(v) ? v : [v];
+            arr.forEach(val => {
+                const el = document.querySelector(`input[name="${n}"][value="${val}"]`);
+                if(el) el.checked = true;
+            });
+        };
+
+        check('nose_flaws', d.nose_flaws); check('nose_traits', d.nose_traits); check('nose_pros', d.nose_pros);
+        check('palate_flaws', d.palate_flaws); check('palate_traits', d.palate_traits); check('palate_pros', d.palate_pros);
+        check('finish_flaws', d.finish_flaws); check('finish_traits', d.finish_traits); check('finish_pros', d.finish_pros);
+        check('true_to', d.true_to);
+        if(d.balance) check('balance', d.balance);
+        if(d.profile) check('profile', d.profile);
+    }
+
+    // --- 4. STANDARD UTILS (Navigation, Saving, etc.) ---
     function fetchSheets() {
         const sel = document.getElementById('sheetSelector');
         fetch(`${SCRIPT_URL}?action=getSheets`)
@@ -362,34 +421,16 @@ function renderProfileForm(config) {
                 sel.add(opt);
             });
             const lastSheet = localStorage.getItem('lastSheet');
-            if(lastSheet && d.sheets.includes(lastSheet)) {
-                sel.value = lastSheet;
-            }
+            if(lastSheet && d.sheets.includes(lastSheet)) sel.value = lastSheet;
             if(d.sheets.length > 0) loadSheetData();
         });
     }
 
     function createNewSheet() {
-        const name = prompt("New Event Name (e.g. 'Paulee 2026'):");
+        const name = prompt("New Event Name:");
         if(!name) return;
-        
-        const sel = document.getElementById('sheetSelector');
-        let opt = document.createElement('option');
-        opt.text = "Creating " + name + "...";
-        sel.add(opt, 0);
-        sel.selectedIndex = 0;
-
-        fetch(SCRIPT_URL, {
-            method: 'POST', mode: 'no-cors',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ action: "createSheet", newSheetName: name })
-        }).then(() => {
-            setTimeout(() => {
-                localStorage.setItem('lastSheet', name); 
-                fetchSheets(); 
-                alert("Sheet Created!");
-            }, 2000);
-        });
+        fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: "createSheet", newSheetName: name }) })
+        .then(() => { setTimeout(() => { fetchSheets(); alert("Sheet Created!"); }, 2000); });
     }
 
     function loadSheetData() {
@@ -397,42 +438,27 @@ function renderProfileForm(config) {
         localStorage.setItem('lastSheet', sheet); 
         const btn = document.getElementById('saveBtn');
         btn.textContent = "...";
-        
         fetch(`${SCRIPT_URL}?action=getData&sheet=${sheet}`)
         .then(r => r.json())
-        .then(d => {
-            localData = d.rows || [];
-            resetForm(); 
-        });
+        .then(d => { localData = d.rows || []; resetForm(); });
     }
 
     function nav(dir) {
         if(localData.length === 0) return;
-        if(currentIndex === -1 && dir === 1) return; 
-
-        let newIndex;
-        if(currentIndex === -1 && dir === -1) {
-            newIndex = localData.length - 1; 
-        } else {
-            newIndex = currentIndex + dir;
-        }
-
+        if(currentIndex === -1 && dir === 1) return;
+        let newIndex = (currentIndex === -1 && dir === -1) ? localData.length - 1 : currentIndex + dir;
         if (newIndex < 0) newIndex = 0;
         if (newIndex >= localData.length) newIndex = localData.length - 1;
-        
         loadRecord(newIndex);
     }
 
     function loadRecord(idx) {
-        resetForm();  
         currentIndex = idx;
         isUpdating = true;
         fillForm(localData[idx]);
-        
         const btn = document.getElementById('saveBtn');
         btn.textContent = "UPDATE";
         btn.classList.add('update');
-        
         document.getElementById('prevBtn').disabled = (idx === 0);
         document.getElementById('nextBtn').disabled = (idx === localData.length - 1);
     }
@@ -440,183 +466,39 @@ function renderProfileForm(config) {
     function resetForm() {
         currentIndex = -1;
         isUpdating = false;
-        
         document.getElementById('wineRef').value = "";
         document.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
         document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
         document.querySelectorAll('input[type="text"]').forEach(t => t.value = "");
-        
         const btn = document.getElementById('saveBtn');
         btn.textContent = "SAVE";
         btn.classList.remove('update');
         btn.disabled = false;
-        
-        // Hide AI box on new
         document.getElementById('aiNoteBox').classList.remove('visible');
-
-        document.getElementById('prevBtn').disabled = (localData.length === 0);
-        document.getElementById('nextBtn').disabled = true; 
     }
-
-
-    // --- CENTRALIZED HTML BUILDER ---
-// --- VERSION WITH UNIFIED FONT SIZES ---
-function buildReportHtml(note, score, breakdown, date, profile) {
-    if (!breakdown || !score) {
-        return note ? note.replace(/\n/g, '<br>') : "";
-    }
-
-    let badgeHtml = renderScoreReport(breakdown);
-    let pName = profile || "Burgundy EP"; 
-    let tDate = date || ""; 
-
-    let formattedNote = note;
-    if (note) {
-        let paragraphs = note.split(/\n\s*\n/);
-        if (paragraphs.length > 1) {
-            formattedNote = paragraphs.map(p => `<p style="margin-bottom: 12px;">${p.trim()}</p>`).join("");
-        } else {
-            formattedNote = note.replace(/\n/g, '<br>');
-        }
-    }
-
-    return `
-        <div style="font-family:serif; font-size:1.05em; line-height:1.5; color:#333; margin-bottom: 25px;">
-            ${formattedNote}
-        </div>
-        
-        <div style="font-family:-apple-system, sans-serif;">
-            <!-- Unified Line: Same Size (1.15em), Different Weight -->
-            <div style="font-size:1.15em; color:#2c3e50; margin-bottom:6px; display:flex; align-items:baseline;">
-                <span style="font-weight:800;">Score: ${score},</span> 
-                <span style="font-weight:normal; color:#555; margin-left:6px;">${tDate}</span>
-            </div>
-            
-            <div style="font-size:0.9em; line-height:1.8;">
-                ${badgeHtml}
-            </div>
-            
-            <div style="font-size:9px; color:#ccc; margin-top:12px; text-transform:uppercase; letter-spacing:0.5px;">
-                Profile: ${pName}
-            </div>
-        </div>
-    `;
-}
-
-
-
-    
-    function fillForm(d) {
-        document.getElementById('wineRef').value = d.ref || "";
-        const check = (n, v) => {
-            if(!v) return;
-            const arr = Array.isArray(v) ? v : [v];
-            arr.forEach(val => {
-                const el = document.querySelector(`input[name="${n}"][value="${val}"]`);
-                if(el) el.checked = true;
-            });
-        };
-        check('nose_flaws', d.nose_flaws); check('nose_traits', d.nose_traits); check('nose_pros', d.nose_pros);
-        check('palate_flaws', d.palate_flaws); check('palate_traits', d.palate_traits); check('palate_pros', d.palate_pros);
-        check('finish_flaws', d.finish_flaws); check('finish_traits', d.finish_traits); check('finish_pros', d.finish_pros);
-        check('true_to', d.true_to);
-        if(d.balance) { let el = document.querySelector(`input[name="balance"][value="${d.balance}"]`); if(el) el.checked = true; }
-        if(d.profile) { let el = document.querySelector(`input[name="profile"][value="${d.profile}"]`); if(el) el.checked = true; }
-        document.getElementById('comm_too').value = d.comm_too || "";
-        document.getElementById('comm_lacks').value = d.comm_lacks || "";
-        document.getElementById('comm_rem').value = d.comm_rem || "";
-
-      // --- SIMPLIFIED DISPLAY LOGIC ---
-        const aiBox = document.getElementById('aiNoteBox');
-        const aiText = document.getElementById('aiNoteText');
-        
-        // Use the centralized builder
-        let finalHtml = buildReportHtml(
-            d.ai_note, 
-            d.scoreDisplay, 
-            d.scoreBreakdown, 
-            d.tastedDate, 
-            d.profileName
-        );
-
-        if(finalHtml) {
-            aiText.innerHTML = finalHtml;
-            aiBox.classList.add('visible');
-        } else {
-            aiBox.classList.remove('visible');
-        }
-    }
-
-
 
     function getChecked(n) { return Array.from(document.querySelectorAll(`input[name="${n}"]:checked`)).map(c => c.value); }
     function getRadio(n) { let el = document.querySelector(`input[name="${n}"]:checked`); return el ? el.value : ""; }
 
-function renderScoreReport(breakdownData) {
-    if (!breakdownData) return "";
-    let html = "";
-    breakdownData.forEach(item => {
-        if (item.type === 'spacer') { html += '<div class="report-spacer"></div>'; return; }
-        if (item.type === 'break') { html += '<br>'; return; }
-        
-        // 1. Handle Value Display (+1.2, -2, etc)
-        let valDisplay = "";
-        if (item.value !== undefined && item.value !== null) {
-            let sign = (item.value > 0) ? "+" : "";
-            valDisplay = " <b>" + sign + item.value + "</b>";
-        }
-        
-        // 2. Handle Label Formatting (Bolding the "X" in "X / Y")
-        let labelDisplay = item.label;
-        if (item.type === 'pro') {
-            // Regex to find " 2.5 / 5.0" and bold the "2.5"
-            // Looks for: space + number + space + slash + space + number
-            labelDisplay = labelDisplay.replace(/ (\d+(\.\d+)?) \/ (\d+(\.\d+)?)/, ' <b>$1</b> / $3');
-        }
-
-        // 3. Handle Gradient Background
-        let styleAttr = "";
-        if (item.type === 'pro' && item.percent) {
-            styleAttr = `style="background: linear-gradient(90deg, #b9f6ca ${item.percent}%, #f1f8e9 ${item.percent}%);"`;
-        }
-        
-        html += `<span class="report-badge badge-${item.type}" ${styleAttr}>${labelDisplay}${valDisplay}</span>`;
-    });
-    return html;
-}
-
-
-
-    
     function submitData() {
-        const btn = document.getElementById('saveBtn');
         const ref = document.getElementById('wineRef').value;
-        const sheet = document.getElementById('sheetSelector').value;
-        const aiBox = document.getElementById('aiNoteBox');
-        const aiText = document.getElementById('aiNoteText');
-        
         if(!ref) { alert("Enter Wine Name"); return; }
+        if (isUpdating && !confirm("Overwrite data?")) return;
 
-        if (isUpdating) {
-            if (!confirm("⚠️ UPDATE WARNING ⚠️\n\nYou are editing an existing historical record.\nAre you sure you want to overwrite this data?")) {
-                return;
-            }
-        }
-
-        btn.textContent = "AI GENERATING...";
+        const btn = document.getElementById('saveBtn');
+        btn.textContent = "GENERATING...";
         btn.disabled = true;
-        aiBox.classList.add('visible');
-        aiText.innerHTML = "<i>Analyzing data & writing note...</i>";
 
         const payload = {
             action: isUpdating ? "update" : "create",
             rowIndex: isUpdating ? localData[currentIndex].rowIndex : null,
-            sheetName: sheet,
+            sheetName: document.getElementById('sheetSelector').value,
+            profileName: document.getElementById('profileSelector').value, // This sends the CURRENT dropdown value
             ref: ref,
             nose_flaws: getChecked('nose_flaws'), nose_traits: getChecked('nose_traits'), nose_pros: getChecked('nose_pros'),
             palate_flaws: getChecked('palate_flaws'), palate_traits: getChecked('palate_traits'), palate_pros: getChecked('palate_pros'),
             finish_flaws: getChecked('finish_flaws'), finish_traits: getChecked('finish_traits'), finish_pros: getChecked('finish_pros'),
-            balance: getRadio('balance'), profile: getRadio('profile'), true_to: getChecked('true_to'),
+            balance: getChecked('balance'), profile: getRadio('profile'), true_to: getChecked('true_to'),
             comm_too: document.getElementById('comm_too').value,
             comm_lacks: document.getElementById('comm_lacks').value,
             comm_rem: document.getElementById('comm_rem').value
@@ -629,87 +511,57 @@ function renderScoreReport(breakdownData) {
         })
         .then(response => response.json())
         .then(data => {
-            if(data.error) {
-                alert("Error: " + data.error);
-                btn.textContent = "ERROR";
-                btn.disabled = false;
-                return;
-            }
-
-            // UNIFIED TEMPLATE via Helper
-            let combinedHtml = buildReportHtml(
-                data.ai_note, 
-                data.scoreDisplay, 
-                data.scoreBreakdown, 
-                data.tastedDate, 
-                data.profileName
-            );
-
-            aiText.innerHTML = combinedHtml;
-            aiBox.classList.add('visible');
+            if(data.error) { alert("Error: " + data.error); btn.disabled=false; return; }
+            
+            // Render Result
+            const aiText = document.getElementById('aiNoteText');
+            aiText.innerHTML = buildReportHtml(data.ai_note, data.scoreDisplay, data.scoreBreakdown, data.tastedDate, data.profileName);
+            document.getElementById('aiNoteBox').classList.add('visible');
 
             btn.textContent = isUpdating ? "UPDATED" : "SAVED";
             
-            if (isUpdating) {
-                setTimeout(() => { btn.textContent = "UPDATE"; btn.disabled = false; }, 1000);
-                if (localData[currentIndex]) {
-                    localData[currentIndex].ai_note = data.ai_note; 
-                    localData[currentIndex].ref = ref;
-                    localData[currentIndex].scoreDisplay = data.scoreDisplay;
-                    localData[currentIndex].scoreBreakdown = data.scoreBreakdown;
-                    localData[currentIndex].tastedDate = data.tastedDate; // Update Cache!
-                    localData[currentIndex].profileName = data.profileName; // Update Cache!
-                }
-            } else {
-                setTimeout(() => { loadSheetData(); }, 2000); 
-            }
-        })
-        .catch(e => {
-            console.error(e);
-            alert("Network Error. Check Console.");
-            btn.textContent = "ERROR";
-            btn.disabled = false;
-        });
-    }
-
-
-
-    function deleteRecord() {
-        if(!isUpdating) return;
-        if(!confirm("Delete?")) return;
-        
-        // Remember where we were
-        let indexToDelete = currentIndex;
-        
-        fetch(SCRIPT_URL, {
-            method: 'POST', mode: 'no-cors',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                action: "delete",
-                rowIndex: localData[currentIndex].rowIndex,
-                sheetName: document.getElementById('sheetSelector').value
-            })
-        }).then(() => {
-            // Reload data, but try to stay nearby
+            // Refresh Background
             const sheet = document.getElementById('sheetSelector').value;
             fetch(`${SCRIPT_URL}?action=getData&sheet=${sheet}`)
             .then(r => r.json())
-            .then(d => {
-                localData = d.rows || [];
-                
-                // Logic: Go to the previous record, or stay at 0 if we deleted the first.
-                // If list is empty, reset.
-                if (localData.length === 0) {
-                    resetForm();
-                } else {
-                    let newIdx = indexToDelete - 1;
-                    if (newIdx < 0) newIdx = 0;
-                    loadRecord(newIdx);
-                }
+            .then(d => { 
+                localData = d.rows || []; 
+                if(!isUpdating) currentIndex = localData.length - 1; 
+                isUpdating = true;
+                setTimeout(() => { btn.textContent = "UPDATE"; btn.classList.add('update'); btn.disabled = false; }, 1000);
             });
-        });
+        })
+        .catch(e => { alert("Save Failed"); btn.disabled=false; });
+    }
+    
+    function deleteRecord() {
+        if(!isUpdating || !confirm("Delete?")) return;
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: "delete", rowIndex: localData[currentIndex].rowIndex, sheetName: document.getElementById('sheetSelector').value })
+        }).then(() => { loadSheetData(); });
     }
 
+    function buildReportHtml(note, score, breakdown, date, profile) {
+        if (!breakdown || !score) return note ? note.replace(/\n/g, '<br>') : "";
+        let badgeHtml = breakdown.map(item => {
+            if (item.type === 'spacer') return '<div class="report-spacer"></div>';
+            if (item.type === 'break') return '<br>';
+            let label = item.type === 'pro' ? item.label.replace(/ (\d+(\.\d+)?) \/ (\d+(\.\d+)?)/, ' <b>$1</b> / $3') : item.label;
+            let val = (item.value !== undefined) ? ` <b>${item.value>0?"+":""}${item.value}</b>` : "";
+            let style = (item.type === 'pro' && item.percent) ? `style="background: linear-gradient(90deg, #b9f6ca ${item.percent}%, #f1f8e9 ${item.percent}%);"` : "";
+            return `<span class="report-badge badge-${item.type}" ${style}>${label}${val}</span>`;
+        }).join('');
+        return `<div style="font-family:serif; font-size:1.05em; line-height:1.5; color:#333; margin-bottom: 25px;">${note?note.replace(/\n/g, '<br>'):""}</div>
+        <div style="font-family:-apple-system, sans-serif;">
+            <div style="font-size:1.15em; color:#2c3e50; margin-bottom:6px; display:flex; align-items:baseline;">
+                <span style="font-weight:800;">Score: ${score},</span> 
+                <span style="font-weight:normal; color:#555; margin-left:6px;">${date||""}</span>
+            </div>
+            <div style="font-size:0.9em; line-height:1.8;">${badgeHtml}</div>
+            <div style="font-size:9px; color:#ccc; margin-top:12px; text-transform:uppercase; letter-spacing:0.5px;">Profile: ${profile||"Unknown"}</div>
+        </div>`;
+    }
 </script>
 
 </body>
