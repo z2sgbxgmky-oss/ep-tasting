@@ -45,9 +45,24 @@
         h1 { margin: 0; font-size: 1.4rem; color: var(--burgundy); font-weight: 800; }
         .step-badge { font-size: 0.8rem; background: #edf2f7; padding: 4px 8px; border-radius: 6px; color: #718096; font-weight: 600; }
         
-        .template-loader { display: flex; gap: 10px; background: #f7fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--border-light); }
-        select { flex-grow: 1; padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 0.95rem; background: white; }
-        .btn-load { background: var(--burgundy); color: white; border: none; padding: 0 20px; font-weight: 700; border-radius: 6px; cursor: pointer; }
+/* ... */
+.template-loader { display: flex; gap: 10px; background: #f7fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--border-light); }
+
+/* UPDATED SELECT RULE */
+select { 
+    flex: 1 1 auto;         /* Allow growing AND shrinking */
+    max-width: 65%;         /* Stop it from pushing the button off-screen */
+    min-width: 0;           /* Crucial for flex items to shrink past content size */
+    
+    padding: 10px; 
+    border: 1px solid #cbd5e0; 
+    border-radius: 6px; 
+    font-size: 0.95rem; 
+    background: white; 
+}
+
+.btn-load { background: var(--burgundy); color: white; border: none; padding: 0 20px; font-weight: 700; border-radius: 6px; cursor: pointer; flex-shrink: 0; } /* Ensure button NEVER shrinks */
+/* ... */
 
         /* --- STEP 1: STRUCTURE --- */
         .meta-grid { display: grid; gap: 15px; margin-bottom: 30px; }
