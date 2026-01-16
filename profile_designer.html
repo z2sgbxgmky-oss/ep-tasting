@@ -115,8 +115,12 @@
             <h1>Profile Designer</h1>
             <!-- Badge + Help Button Wrapper -->
 <div style="display:flex; align-items:center; gap:10px;">
-    <!-- Added id="btnHelp" and class="hidden" -->
+    <!-- Step 1 Help Button (New) -->
+    <button id="btnDesignHelp" onclick="toggleDesignGuide()" style="background:#edf2f7; color:#2d3748; border:1px solid #cbd5e0; width:28px; height:28px; border-radius:50%; font-weight:bold; cursor:pointer; font-family:serif; font-style:italic;" title="Read Design Guidelines">i</button>
+    
+    <!-- Step 2 Help Button (Existing, initially hidden) -->
     <button id="btnHelp" onclick="toggleGuide()" class="hidden" style="background:#edf2f7; color:#2d3748; border:1px solid #cbd5e0; width:28px; height:28px; border-radius:50%; font-weight:bold; cursor:pointer; font-family:serif; font-style:italic;" title="Read Scoring Methodology">i</button>
+    
     <span id="stepBadge" class="step-badge">Step 1: Structure</span>
 </div>
         </div>
@@ -303,6 +307,38 @@
     </div>
 </div>
 
+<!-- DESIGN GUIDELINES MODAL -->
+<div id="designGuideModal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; display:flex; justify-content:center; align-items:center; backdrop-filter:blur(2px);">
+    <div style="background:white; width:90%; max-width:600px; max-height:85vh; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.2); display:flex; flex-direction:column;">
+        
+        <div style="padding:15px 20px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+            <h2 style="margin:0; font-size:1.1rem; color:#2d3748;">Profile Design Guidelines</h2>
+            <button onclick="toggleDesignGuide()" style="border:none; background:none; font-size:1.5rem; cursor:pointer; color:#718096;">&times;</button>
+        </div>
+
+        <div style="padding:20px; overflow-y:auto; line-height:1.6; color:#4a5568; font-size:0.9rem;">
+            <h4 style="margin:0 0 5px 0; color:#2d3748;">1. Cross-Section Symmetry</h4>
+            <p style="margin:0 0 15px 0;">Aim for the same number of Flaws, Neutral Traits, and Pros across sections (Nose, Palate, Finish)</p>
+
+            <h4 style="margin:0 0 5px 0; color:#2d3748;">2. Types Coverage</h4>
+            <p style="margin:0 0 15px 0;">The lists for Balance and Profile must be complete. Every single wine of this profile in existence must fall into exactly one of these categories. For example, a fruit profile cannot just be "Citrus" or "Tropical"—it must span the entire spectrum from under-ripe to over-ripe so nothing is left out.</p>
+
+            <h4 style="margin:0 0 5px 0; color:#2d3748;">3. Pros Conflict</h4>
+            <p style="margin:0 0 15px 0;">The Pros in each section must represent distinct, often opposing styles of excellence. You shouldn't list "Rich" and "Powerful" (similar). You should list "Rich" vs. "Precise" vs. "Complex", so you can define <em>why</em> the wine is good.</p>
+
+            <h4 style="margin:0 0 5px 0; color:#2d3748;">4. Flaws vs. Traits</h4>
+            <ul style="margin:0 0 15px 0; padding-left:20px;">
+                <li><strong>Traits:</strong> Neutral stylistic choices (e.g., "Oak Spice" or "Reduction"). These are flavour descriptors, not judgments.</li>
+                <li><strong>Flaws:</strong> Deal-breakers that ruin the wine or betray its origin (e.g., "Premox/Cider" or "Tropical/Heavy"). If Montrachet tastes like cheap Chardonnay from a hot climate, it's a flaw.</li>
+            </ul>
+        </div>
+        
+        <div style="padding:15px; border-top:1px solid #e2e8f0; text-align:right;">
+            <button onclick="toggleDesignGuide()" style="background:#2d3748; color:white; border:none; padding:8px 20px; border-radius:6px; font-weight:600; cursor:pointer;">Close</button>
+        </div>
+    </div>
+</div>
+
 
 
 
@@ -370,6 +406,8 @@
         document.getElementById('step2').classList.remove('hidden');
         document.getElementById('loaderBox').classList.add('hidden');
         document.getElementById('stepBadge').innerText = "Step 2: Logic & Scoring";
+        document.getElementById('btnDesignHelp').classList.add('hidden');         
+        document.getElementById('btnHelp').classList.remove('hidden');  
         document.getElementById('btnHelp').classList.remove('hidden'); 
         document.getElementById('btnBack').classList.remove('hidden');
         document.getElementById('btnNext').classList.add('hidden');
@@ -382,6 +420,8 @@
     function goToStep1() {
         document.getElementById('step2').classList.add('hidden');
         document.getElementById('step1').classList.remove('hidden');
+        document.getElementById('btnDesignHelp').classList.remove('hidden'); 
+        document.getElementById('btnHelp').classList.add('hidden');    
         document.getElementById('loaderBox').classList.remove('hidden');
         document.getElementById('stepBadge').innerText = "Step 1: Structure";
         document.getElementById('btnHelp').classList.add('hidden');
@@ -431,7 +471,6 @@ updateWeights();
             const grid = sub.querySelector('.score-grid');
             config.balance.forEach(item => {
                 if(!item) return;
-                allFlaws.push(item);
                 let val = config.itemScores[item] !== undefined ? config.itemScores[item] : 0;
                 config.itemScores[item] = val;
                 grid.appendChild(mkSliderRow(item, val, -10, 0, 1, false));
@@ -760,6 +799,16 @@ window.updateItemScore = function(label, val, isPro) {
             modal.classList.add('hidden');
         }
     }
+
+    function toggleDesignGuide() {
+        const modal = document.getElementById('designGuideModal');
+        if (modal.classList.contains('hidden')) {
+            modal.classList.remove('hidden');
+        } else {
+            modal.classList.add('hidden');
+        }
+    }
+
 
 </script>
 
