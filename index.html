@@ -129,6 +129,68 @@
         .ai-note-box.visible { display: block; }
         .ai-label { display: none; }
 
+
+        /* BROWSER MODAL STYLES */
+        .browser-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 2000;
+            display: flex; justify-content: flex-end; /* Slides in from right */
+            transition: opacity 0.2s;
+        }
+        .browser-overlay.hidden { display: none; opacity: 0; }
+
+        .browser-container {
+            width: 85%; max-width: 400px; height: 100%;
+            background: var(--card-bg); box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+            display: flex; flex-direction: column;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+        .browser-header {
+            padding: 15px; border-bottom: 1px solid #edf2f7;
+            display: flex; justify-content: space-between; align-items: center;
+            background: #f8f9fa;
+        }
+        .browser-header h3 { margin: 0; color: #2d3748; font-size: 1.1rem; }
+        .btn-close {
+            background: none; border: none; font-size: 1.8rem; line-height: 1; cursor: pointer; color: #718096;
+        }
+
+        .browser-search { padding: 10px; border-bottom: 1px solid #edf2f7; }
+        .browser-search input {
+            width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px;
+            font-size: 1rem; box-sizing: border-box; outline: none;
+        }
+        .browser-search input:focus { border-color: #cbd5e0; }
+
+        .browser-list {
+            flex-grow: 1; overflow-y: auto; padding: 10px;
+            background: #f7fafc;
+        }
+
+        /* WINE CARD STYLE */
+        .wine-card {
+            background: white; border: 1px solid #e2e8f0; border-radius: 8px;
+            padding: 12px; margin-bottom: 8px; cursor: pointer;
+            transition: transform 0.1s, border-color 0.1s;
+            border-left: 4px solid transparent;
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        .wine-card:hover { transform: translateY(-1px); border-color: #cbd5e0; }
+        /* Active state highlights the card */
+        .wine-card.active { border-left-color: var(--burgundy); background: #fff5f5; }
+
+        .wc-top { display: flex; justify-content: space-between; align-items: flex-start; }
+        .wc-ref { font-weight: 700; color: #2d3748; font-size: 0.95rem; }
+        .wc-score { 
+            background: #2d3748; color: white; padding: 2px 6px; 
+            border-radius: 4px; font-weight: 700; font-size: 0.8rem; 
+        }
+        .wc-meta { font-size: 0.75rem; color: #718096; display: flex; justify-content: space-between; margin-top: 4px;}
+
+
         .section-header { font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #a0aec0; border-bottom: 1px solid #edf2f7; margin: 10px 0 8px 0; }
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; transition: opacity 0.2s; }
         @media (max-width: 700px) { .grid-3 { grid-template-columns: 1fr; margin-bottom: 20px; } }
@@ -240,9 +302,29 @@
     </div>
 </div>
 
-<div class="footer-control">
+<!-- WINE BROWSER MODAL -->
+<div id="browserModal" class="browser-overlay hidden">
+    <div class="browser-container">
+        <div class="browser-header">
+            <h3>Wine Library</h3>
+            <button onclick="toggleBrowser()" class="btn-close">&times;</button>
+        </div>
+        
+        <div class="browser-search">
+            <input type="text" id="browserSearch" placeholder="Filter wines..." onkeyup="renderBrowserList()">
+        </div>
+
+        <div id="browserList" class="browser-list">
+            <!-- Dynamic Content Goes Here -->
+        </div>
+    </div>
+</div>
+
+
+<div class="footer-control" style="grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr;">
     <button id="saveBtn" class="ft-btn btn-save" onclick="submitData()">SAVE</button>
     <button class="ft-btn" onclick="resetForm()">+</button>
+    <button class="ft-btn" onclick="toggleBrowser()" style="font-size:1.4rem;">☰</button> <!-- NEW LIST BUTTON -->
     <button id="prevBtn" class="ft-btn" onclick="nav(-1)">&lt;</button>
     <button id="nextBtn" class="ft-btn" onclick="nav(1)">&gt;</button>
     <button class="ft-btn btn-trash" onclick="deleteRecord()">🗑</button>
@@ -484,6 +566,9 @@
         btn.classList.add('update');
         document.getElementById('prevBtn').disabled = (idx === 0);
         document.getElementById('nextBtn').disabled = (idx === localData.length - 1);
+        
+        // NEW: Update button states
+        updateNavButtons();
     }
 
     function resetForm() {
@@ -500,8 +585,8 @@
         document.getElementById('aiNoteBox').classList.remove('visible');
         
         // NEW: Disable Next button (no record to navigate to)
-        document.getElementById('nextBtn').disabled = true;
-        document.getElementById('prevBtn').disabled = false;
+        document.getElementById('nextBtn').disabled = true; // Can't go forward from new
+        document.getElementById('prevBtn').disabled = (localData.length === 0); // Can go back if data exists
     }
 
 
@@ -593,6 +678,85 @@
 
     function openProfileDesigner() {
         alert("Profile Designer (Coming Soon)");
+    }
+
+
+    // --- WINE BROWSER LOGIC ---
+
+    function toggleBrowser() {
+        const modal = document.getElementById('browserModal');
+        const isHidden = modal.classList.contains('hidden');
+        
+        if (isHidden) {
+            modal.classList.remove('hidden');
+            renderBrowserList();
+            // Auto-focus search for quick filtering
+            setTimeout(() => document.getElementById('browserSearch').focus(), 100);
+        } else {
+            modal.classList.add('hidden');
+        }
+    }
+
+    function renderBrowserList() {
+        const listEl = document.getElementById('browserList');
+        const filter = document.getElementById('browserSearch').value.toLowerCase();
+        listEl.innerHTML = "";
+
+        if (!localData || localData.length === 0) {
+             listEl.innerHTML = `<div style="text-align:center; color:#a0aec0; margin-top:20px;">No wines in this sheet yet.</div>`;
+             return;
+        }
+
+        // Iterate backwards so newest wines (bottom of sheet) appear at top of list
+        // utilize localData which is already populated by loadSheetData()
+        localData.slice().reverse().forEach((row, revIndex) => {
+            // Calculate original index because we reversed the array
+            const originalIndex = localData.length - 1 - revIndex;
+            
+            const ref = (row.ref || "(No Name)").toString();
+            const score = row.scoreDisplay || "-";
+            const profile = row.profileName || "Unknown";
+            const date = row.tastedDate || "";
+
+            // Filter Logic
+            if (filter && !ref.toLowerCase().includes(filter) && !profile.toLowerCase().includes(filter)) {
+                return;
+            }
+
+            const card = document.createElement('div');
+            // Check if this card matches the currently loaded record
+            const isActive = (currentIndex === originalIndex);
+            card.className = `wine-card ${isActive ? 'active' : ''}`;
+            
+            card.onclick = () => {
+                loadRecord(originalIndex);
+                toggleBrowser(); // Close panel after selection
+            };
+
+            card.innerHTML = `
+                <div class="wc-top">
+                    <span class="wc-ref">${ref}</span>
+                    <span class="wc-score">${score}</span>
+                </div>
+                <div class="wc-meta">
+                    <span>${profile}</span>
+                    <span>${date}</span>
+                </div>
+            `;
+            listEl.appendChild(card);
+        });
+
+        if (listEl.innerHTML === "") {
+            listEl.innerHTML = `<div style="text-align:center; color:#a0aec0; margin-top:20px;">No wines found matching "${filter}".</div>`;
+        }
+    }
+
+    function updateNavButtons() {
+        // Disable Previous if we are at the first record (index 0)
+        document.getElementById('prevBtn').disabled = (currentIndex <= 0);
+        
+        // Disable Next if we are at the last record
+        document.getElementById('nextBtn').disabled = (currentIndex >= localData.length - 1);
     }
 
 
