@@ -435,15 +435,19 @@
         .then(d => {
             sel.innerHTML = "";
             d.sheets.forEach(s => {
+                // Filter out sheets starting with "_" (like _CONFIG_PROFILES)
+                if (s.startsWith("_")) return; 
+                
                 let opt = document.createElement('option');
                 opt.value = s; opt.text = s;
                 sel.add(opt);
             });
             const lastSheet = localStorage.getItem('lastSheet');
             if(lastSheet && d.sheets.includes(lastSheet)) sel.value = lastSheet;
-            if(d.sheets.length > 0) loadSheetData();
+            if(d.sheets.length > 0 && sel.value) loadSheetData();
         });
     }
+
 
     function createNewSheet() {
         const name = prompt("New Event Name:");
@@ -588,8 +592,7 @@
     }
 
     function openProfileDesigner() {
-        // Navigate to the separate HTML file
-        window.location.href = "profile_designer.html";
+        alert("Profile Designer (Coming Soon)");
     }
 
 
