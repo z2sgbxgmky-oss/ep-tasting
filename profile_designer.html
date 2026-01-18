@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Profile Designer Pro</title>
+    <title>Wine Profile Designer</title>
     <style>
         :root {
             --bg-color: #f8f9fa;
@@ -45,23 +45,65 @@
         h1 { margin: 0; font-size: 1.4rem; color: var(--burgundy); font-weight: 800; }
         .step-badge { font-size: 0.8rem; background: #edf2f7; padding: 4px 8px; border-radius: 6px; color: #718096; font-weight: 600; }
         
-/* ... */
-.template-loader { display: flex; gap: 10px; background: #f7fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--border-light); }
 
-/* UPDATED SELECT RULE */
-select { 
-    flex: 1 1 auto;         /* Allow growing AND shrinking */
-    min-width: 0;           /* Crucial for flex items to shrink past content size */
+.template-loader {
+    display: flex;
+    gap: 10px;
+    background: #f7fafc;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+    align-items: center;
     
-    padding: 10px; 
-    border: 1px solid #cbd5e0; 
-    border-radius: 6px; 
-    font-size: 0.95rem; 
-    background: white; 
+    flex-wrap: wrap; /* <--- ALLOW WRAPPING */
 }
 
-.btn-load { background: var(--burgundy); color: white; border: none; padding: 0 20px; font-weight: 700; border-radius: 6px; cursor: pointer; flex-shrink: 0; } /* Ensure button NEVER shrinks */
-/* ... */
+.template-loader select {
+    flex: 1 1 200px; /* Grow: 1, Shrink: 1, Basis: 200px. 
+                        If less than 200px space remains, it will trigger a wrap */
+    
+    /* ... keep other styles (height: 42px, etc) ... */
+    height: 42px;
+    padding: 0 10px;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    background: white;
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+/* Ensure buttons don't stretch weirdly if wrapped alone */
+.btn-load {
+    /* ... keep styles ... */
+    flex: 0 0 auto;
+    height: 42px;
+    background: var(--burgundy);
+    color: white;
+    border: none;
+    padding: 0 20px;
+    font-weight: 700;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn-del-header {
+    flex: 0 0 42px;
+    height: 42px;
+    background: white;
+    color: #718096;          /* Soft slate gray icon */
+    border: 1px solid #cbd5e0; /* Matches the Select border */
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;       /* Slightly larger icon */
+    line-height: 1;
+    padding: 0;
+}
+
 
         /* --- STEP 1: STRUCTURE --- */
         .meta-grid { display: grid; gap: 15px; margin-bottom: 30px; }
@@ -143,7 +185,7 @@ select {
                 <option value="">Choose a template or start from scratch...</option>
             </select>
             <button class="btn-load" onclick="loadSelectedTemplate()">LOAD</button>
-            <button id="btnDeleteTemplate" class="btn-load" style="background:transparent; border:1px solid #e53e3e; color:#e53e3e; width:auto; padding:0 10px; display:none;" onclick="deleteSelectedTemplate()" title="Delete this profile">🗑</button>
+            <button id="btnDeleteTemplate" class="btn-del-header" style="display:none;" onclick="deleteSelectedTemplate()" title="Delete this profile">🗑</button>
         </div>
 
     </header>
@@ -361,8 +403,45 @@ select {
 
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwvhb_OSlNid4L39wJ0oiqo7tkCkhQ2U103i9V0N7r25pdJB8Ioj19YPOu2oHtR7YiU/exec";
+
+
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3mzUfj4MRGGdUu_l_3bnpDJXyHFC8jvr0JPfY8BzrD_yeqAbWA0fEPOfmGQOcveAe/exec";
     const TASTING_URL = SCRIPT_URL;
+
+// --- NEW AUTH LOGIC ---
+let CURRENT_USER = localStorage.getItem('wta_user_id');
+
+// If no user is found (e.g. they came directly to this page), ask them.
+if (!CURRENT_USER) {
+    CURRENT_USER = prompt("Enter your email/ID to access your profiles:");
+    if(CURRENT_USER) {
+        localStorage.setItem('wta_user_id', CURRENT_USER);
+    } else {
+        CURRENT_USER = "demo_user"; // Fallback
+    }
+}
+
+
+function apiCall(action, params, isPost = false) {
+    // Automatically append userId to URL
+    let url = `${SCRIPT_URL}?action=${action}&userId=${encodeURIComponent(CURRENT_USER)}`;
+    
+    if (isPost) {
+        const payload = params || {};
+        payload.userId = CURRENT_USER; // Ensure it's in body too for POST
+        payload.action = action;
+        return fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) }).then(r => r.json());
+    }
+    
+    if (params) {
+        for (const [key, value] of Object.entries(params)) {
+            url += `&${key}=${encodeURIComponent(value)}`;
+        }
+    }
+    return fetch(url).then(r => r.json());
+}
+
+
     
     // STATE
     let config = {
@@ -725,14 +804,7 @@ window.updateItemScore = function(label, val, isPro) {
             }
         };
 
-        fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action: "saveProfile", name: final.name, config: final })
-        })
-        .then(r => {
-            if(!r.ok) throw new Error("Network error");
-            return r.json();
-        })
+        apiCall("saveProfile", { name: final.name, config: final }, true)
         .then(d => {
             if(d.result === "success") { 
                 alert("Profile saved successfully!");
@@ -761,8 +833,7 @@ window.updateItemScore = function(label, val, isPro) {
         // Clear options, keep placeholder
         while (sel.options.length > 1) { sel.remove(1); }
 
-        fetch(`${SCRIPT_URL}?action=getProfilesList`)
-        .then(r => r.json())
+        apiCall("getProfilesList")
         .then(d => { 
             if(d.profiles && d.profiles.length > 0) {
                 d.profiles.forEach(p => { 
@@ -771,10 +842,10 @@ window.updateItemScore = function(label, val, isPro) {
                     opt.value = p.name; 
                     
                     if(p.visibility === 'public') {
-                        opt.text = `${p.name} (Public)`;
+                        opt.text = `🌐 ${p.name}`;
                         opt.dataset.type = "public";
                     } else {
-                        opt.text = p.name;
+                        opt.text = `👤 ${p.name}`;
                         opt.dataset.type = "private";
                     }
                     sel.add(opt); 
@@ -789,8 +860,7 @@ window.updateItemScore = function(label, val, isPro) {
         const name = document.getElementById('templateSelector').value;
         if(!name) return;
         
-        fetch(`${SCRIPT_URL}?action=getProfile&name=${encodeURIComponent(name)}`)
-        .then(r => r.json())
+        apiCall("getProfile", { name: name })
         .then(data => {
             config = data; 
             
@@ -882,11 +952,7 @@ window.updateItemScore = function(label, val, isPro) {
         btn.innerText = "...";
         btn.disabled = true;
 
-        fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action: "deleteProfile", name: nameToDelete })
-        })
-        .then(r => r.json())
+        apiCall("deleteProfile", { name: nameToDelete }, true)
         .then(d => {
             if(d.error) {
                 alert("Cannot Delete:\n" + d.error);
