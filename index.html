@@ -254,7 +254,7 @@
         .comment-box span { font-size: 0.65rem; font-weight: 700; color: #718096; text-transform: uppercase; }
         .comment-box input { padding: 6px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 0.85rem; width: 100%; box-sizing: border-box; }
         
-        .footer-control { position: fixed; bottom: 0; left: 0; width: 100%; background: white; border-top: 1px solid #ddd; display: grid; grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr 0.8fr; height: 60px; z-index: 1000; }
+        .footer-control { position: fixed; bottom: 0; left: 0; width: 100%; background: white; border-top: 1px solid #ddd; display: grid; grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr 0.8fr; height: auto; min-height: 60px; padding-bottom: env(safe-area-inset-bottom); height: 60px; z-index: 1000; }
         .ft-btn { background: white; border: none; border-left: 1px solid #eee; font-size: 1.2rem; cursor: pointer; color: #4a5568; display: flex; justify-content: center; align-items: center; font-weight: 700; padding: 0; transition: background 0.2s; }
         .ft-btn:active { background: #f7fafc; }
         .ft-btn:disabled { color: #e2e8f0; cursor: not-allowed; }
