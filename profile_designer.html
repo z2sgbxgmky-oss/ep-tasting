@@ -138,10 +138,14 @@ select {
     <span id="stepBadge" class="step-badge">Step 1: Structure</span>
 </div>
         </div>
-        <div id="loaderBox" class="template-loader">
-            <select id="templateSelector"><option value="">Choose a template or start from scratch...</option></select>
+        <div id="loaderBox" class="template-loader" style="display:flex; gap:8px; align-items:center;">
+            <select id="templateSelector" style="flex-grow:1;" onchange="updateDeleteVisibility()">
+                <option value="">Choose a template or start from scratch...</option>
+            </select>
             <button class="btn-load" onclick="loadSelectedTemplate()">LOAD</button>
+            <button id="btnDeleteTemplate" class="btn-load" style="background:transparent; border:1px solid #e53e3e; color:#e53e3e; width:auto; padding:0 10px; display:none;" onclick="deleteSelectedTemplate()" title="Delete this profile">🗑</button>
         </div>
+
     </header>
 
 
@@ -753,10 +757,33 @@ window.updateItemScore = function(label, val, isPro) {
 
     // --- LOADER ---
     function fetchProfiles() {
+        const sel = document.getElementById('templateSelector');
+        // Clear options, keep placeholder
+        while (sel.options.length > 1) { sel.remove(1); }
+
         fetch(`${SCRIPT_URL}?action=getProfilesList`)
         .then(r => r.json())
-        .then(d => { d.profiles.forEach(p => { let opt = document.createElement('option'); opt.value = p; opt.text = p; document.getElementById('templateSelector').add(opt); }); });
+        .then(d => { 
+            if(d.profiles && d.profiles.length > 0) {
+                d.profiles.forEach(p => { 
+                    let opt = document.createElement('option'); 
+                    // Backend now sends objects: {name, visibility, author}
+                    opt.value = p.name; 
+                    
+                    if(p.visibility === 'public') {
+                        opt.text = `${p.name} (Public)`;
+                        opt.dataset.type = "public";
+                    } else {
+                        opt.text = p.name;
+                        opt.dataset.type = "private";
+                    }
+                    sel.add(opt); 
+                }); 
+            }
+            updateDeleteVisibility();
+        });
     }
+
 
     function loadSelectedTemplate() {
         const name = document.getElementById('templateSelector').value;
@@ -823,6 +850,62 @@ window.updateItemScore = function(label, val, isPro) {
         }
     }
 
+
+    function updateDeleteVisibility() {
+        const sel = document.getElementById('templateSelector');
+        const btn = document.getElementById('btnDeleteTemplate');
+        
+        if (sel.selectedIndex <= 0) {
+            btn.style.display = 'none';
+            return;
+        }
+
+        const selectedOption = sel.options[sel.selectedIndex];
+        // Only show delete button for Private profiles
+        if (selectedOption.dataset.type === "private") {
+            btn.style.display = 'block';
+        } else {
+            btn.style.display = 'none';
+        }
+    }
+
+    function deleteSelectedTemplate() {
+        const sel = document.getElementById('templateSelector');
+        const nameToDelete = sel.value;
+        
+        if(!nameToDelete) return;
+        
+        if(!confirm(`PERMANENTLY DELETE profile "${nameToDelete}"?\n\nThis cannot be undone.`)) return;
+
+        const btn = document.getElementById('btnDeleteTemplate');
+        const originalText = btn.innerText;
+        btn.innerText = "...";
+        btn.disabled = true;
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: "deleteProfile", name: nameToDelete })
+        })
+        .then(r => r.json())
+        .then(d => {
+            if(d.error) {
+                alert("Cannot Delete:\n" + d.error);
+            } else {
+                alert("Profile deleted.");
+                fetchProfiles(); // Refresh list
+                sel.value = "";  // Reset selection
+            }
+            btn.innerText = originalText;
+            btn.disabled = false;
+        })
+        .catch(e => {
+            alert("Network Error");
+            btn.innerText = originalText;
+            btn.disabled = false;
+        });
+    }
+
+    
 
 </script>
 
