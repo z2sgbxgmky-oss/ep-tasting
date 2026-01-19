@@ -441,7 +441,7 @@
 // --- API WRAPPER (Self-Auth) ---
 let CURRENT_USER = localStorage.getItem('wta_user_id');
 if (!CURRENT_USER) {
-    CURRENT_USER = prompt("Enter your email/ID:");
+    CURRENT_USER = prompt("Welcome to Spit Circut - rapid wine tasting app!\nEnter your name:");
     if(CURRENT_USER) localStorage.setItem('wta_user_id', CURRENT_USER);
     else CURRENT_USER = "demo_user";
 }
