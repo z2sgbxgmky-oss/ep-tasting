@@ -113,6 +113,44 @@
 }
 
 
+/* --- HEADER ACTIONS GROUP --- */
+.header-actions {
+    display: flex;
+    gap: 8px; /* Tightly grouped: 8px space between buttons */
+    align-items: center;
+    flex-shrink: 0; /* Never shrink these */
+    margin-left: 8px; /* Small gap from the dropdown text */
+}
+
+/* --- SHARED STYLE FOR ALL 3 BUTTONS (Pencil, Minus, Plus) --- */
+.btn-header-action {
+    background: transparent;
+    border: 1px solid var(--burgundy);
+    color: var(--burgundy);
+    border-radius: 50%;
+    width: 24px; 
+    height: 24px;
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    padding-bottom: 2px; /* Visual centering tweak */
+    flex-shrink: 0;
+    transition: opacity 0.2s;
+}
+
+/* Specific Tweaks for Icons */
+.btn-header-action.edit-icon { font-size: 0.9rem; } /* Pencil needs to be slightly smaller */
+.btn-header-action.del-icon { font-size: 1.2rem; line-height: 0.8; } /* Minus needs to be larger */
+.btn-header-action.add-icon { font-size: 1.2rem; } /* Plus matches Minus */
+
+/* Utility to hide/show */
+.hidden { display: none !important; }
+
+
+
         .btn-add-profile {
             background: transparent;
             border: 1px solid #718096;
@@ -128,6 +166,11 @@
             align-items: center;
             padding-bottom: 2px;
         }
+
+
+
+
+
 
         .wine-input {
             padding: 10px;
@@ -255,12 +298,13 @@
         .comment-box input { padding: 6px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 0.85rem; width: 100%; box-sizing: border-box; }
         
         .footer-control { position: fixed; bottom: 0; left: 0; width: 100%; background: white; border-top: 1px solid #ddd; display: grid; grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr 0.8fr; height: auto; min-height: 60px; padding-bottom: env(safe-area-inset-bottom); height: 60px; z-index: 1000; }
-        .ft-btn { background: white; border: none; border-left: 1px solid #eee; font-size: 1.2rem; cursor: pointer; color: #4a5568; display: flex; justify-content: center; align-items: center; font-weight: 700; padding: 0; transition: background 0.2s; }
+        .ft-btn { background: white; border: none; border-left: font-size: 1.2rem; cursor: pointer; color: #4a5568; display: flex; justify-content: center; align-items: center; font-weight: 700; padding: 0; transition: background 0.2s; }
+        .ft-btn.nav-icon { font-size: 1.3rem; } /* Larger arrows/list icon */
         .ft-btn:active { background: #f7fafc; }
         .ft-btn:disabled { color: #e2e8f0; cursor: not-allowed; }
         .btn-save { background: var(--burgundy); color: white; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; }
         .btn-save.update { background: #2f855a; } 
-        .btn-trash { color: #c53030; }
+        .btn-trash { color: #c53030; font-size: 1.3rem; }
 
     </style>
 </head>
@@ -268,21 +312,33 @@
 
 <div class="container">
     <header>
-        <div class="header-row">
- 
-        <button onclick="switchUser()" class="btn-logout" title="Current User (Click to Logout)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-        </button>
+<div class="header-row">
+    <!-- User Icon -->
+    <button onclick="switchUser()" class="btn-logout" title="Current User">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+    </button>
 
-            <select id="sheetSelector" class="sheet-dropdown" onchange="loadSheetData()">
-                <option>Loading Sheets...</option>
-            </select>
-            <button class="btn-add-sheet" onclick="createNewSheet()">+</button>
-        </div>
+    <!-- Sheet Selector -->
+    <select id="sheetSelector" class="sheet-dropdown" onchange="loadSheetData()">
+        <option>Loading...</option>
+    </select>
+    
+    <!-- TIGHT BUTTON GROUP -->
+    <div class="header-actions">
+        <!-- Edit (Always Visible) -->
+        <button class="btn-header-action edit-icon" onclick="renameCurrentSheet()" title="Rename Sheet">✎</button>
         
+        <!-- Delete (Hidden by default, shown via JS if empty) -->
+        <button id="btnDelSheet" class="btn-header-action del-icon hidden" onclick="deleteCurrentSheet()" title="Delete Sheet (Empty Only)">−</button>
+        
+        <!-- Add (Always Visible) -->
+        <button class="btn-header-action add-icon" onclick="createNewSheet()">+</button>
+    </div>
+</div>
+
         <input type="text" id="wineRef" class="wine-input" placeholder="Wine Name / Reference" style="margin-top:8px;">
         
         <div id="aiNoteBox" class="ai-note-box">
@@ -367,12 +423,12 @@
 
 <div class="footer-control" style="grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr;">
     <button id="saveBtn" class="ft-btn btn-save" onclick="submitData()">SAVE</button>
-    <button class="ft-btn" onclick="resetForm()">+</button>
-    <button class="ft-btn" onclick="toggleBrowser()" style="font-size:1.4rem;">☰</button> <!-- NEW LIST BUTTON -->
-    <button id="prevBtn" class="ft-btn" onclick="nav(-1)">&lt;</button>
-    <button id="nextBtn" class="ft-btn" onclick="nav(1)">&gt;</button>
+    <button class="ft-btn nav-icon" onclick="resetForm()">+</button>
+    <!-- Made Larger -->
+    <button class="ft-btn nav-icon" onclick="toggleBrowser()">☰</button> 
+    <button id="prevBtn" class="ft-btn nav-icon" onclick="nav(-1)">&lt;</button>
+    <button id="nextBtn" class="ft-btn nav-icon" onclick="nav(1)">&gt;</button>
     <button class="ft-btn btn-trash" onclick="deleteRecord()">🗑</button>
-
 </div>
 
 <script>
@@ -612,6 +668,12 @@ function apiCall(action, params, isPost = false) {
                  opt.text = "No Sheets (Create One +)";
                  sel.add(opt);
             }
+            const delBtn = document.getElementById('btnDelSheet');
+            if (delBtn) {
+                // If count <= 1, disable the button
+                delBtn.disabled = (sheetCount <= 1);
+            }
+
         });
     }
 
@@ -635,6 +697,7 @@ function apiCall(action, params, isPost = false) {
 
     function loadSheetData() {
         const sheetId = document.getElementById('sheetSelector').value;
+        scaleSheetFont(); 
         if(!sheetId) return;
         
         localStorage.setItem('lastSheetId', sheetId); 
@@ -649,6 +712,22 @@ function apiCall(action, params, isPost = false) {
                 return;
             }
             localData = d.rows || []; 
+// SHOW DELETE BUTTON ONLY IF EMPTY ---
+const delBtn = document.getElementById('btnDelSheet');
+if (delBtn) {
+    // Show ONLY if localData is empty (0 rows)
+    if (localData.length === 0) {
+        delBtn.classList.remove('hidden');
+    } else {
+        delBtn.classList.add('hidden');
+    }
+    
+    // Safety: Also hide if it's the ONLY sheet (count check from dropdown)
+    const sel = document.getElementById('sheetSelector');
+    if (sel && sel.options.length <= 1) {
+        delBtn.classList.add('hidden');
+    }
+}
             resetForm(); 
         });
     }
@@ -901,6 +980,64 @@ function switchUser() {
         localStorage.removeItem('lastSheetId'); // Clear sheet memory too
         location.reload(); // Reloads page to trigger the prompt again
     }
+}
+
+
+// --- SHEET MANAGEMENT (Rename/Delete/Scale) ---
+
+function renameCurrentSheet() {
+    const sel = document.getElementById('sheetSelector');
+    const sheetId = sel.value;
+    const oldName = sel.options[sel.selectedIndex].text;
+    
+    const newName = prompt("Rename event:", oldName);
+    if (!newName || newName === oldName) return;
+    
+    apiCall("renameSheet", { sheetId: sheetId, newDisplayName: newName }, true)
+    .then(data => {
+        if(data.error) { alert(data.error); return; }
+        // Update UI locally without full reload
+        sel.options[sel.selectedIndex].text = data.displayName;
+        scaleSheetFont(); // Re-calc font size
+    });
+}
+
+function deleteCurrentSheet() {
+    const sel = document.getElementById('sheetSelector');
+    const sheetId = sel.value;
+    
+    // 1. Single Sheet Check (Frontend)
+    if (sel.options.length <= 1) {
+        alert("Cannot delete your only sheet.");
+        return;
+    }
+    
+    // 2. Confirmation
+    if (!confirm("Are you sure you want to delete this sheet?\n(It must be empty)")) return;
+    
+    apiCall("deleteSheet", { sheetId: sheetId }, true)
+    .then(data => {
+        if(data.error) { alert(data.error); return; }
+        // Success: Remove option and select previous
+        sel.remove(sel.selectedIndex);
+        loadSheetData(); // Load the new selection
+        fetchSheets(); // Sync full list just in case
+    });
+}
+
+function scaleSheetFont() {
+    const sel = document.getElementById('sheetSelector');
+    if (!sel || sel.selectedIndex < 0) return;
+    
+    const text = sel.options[sel.selectedIndex].text;
+    const len = text.length;
+    
+    // Dynamic Scaling Logic
+    // Base: 1.4rem. If len > 15 chars, start shrinking. Min: 0.9rem
+    let newSize = 1.4; 
+    if (len > 15) newSize = Math.max(0.9, 1.4 - ((len - 15) * 0.03));
+    
+    sel.style.fontSize = newSize + "rem";
 }
 
 
