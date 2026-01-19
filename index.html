@@ -46,16 +46,20 @@
 }
 
 .sheet-dropdown {
-    flex-grow: 1;
-    font-size: 1.4rem; /* Match the visual weight of the icon */
+    flex: 1;           /* Take available space */
+    min-width: 0;      /* CRITICAL: Allow shrinking below content size */
+    width: 0;          /* CRITICAL: Forces flexbox to calculate width based on container, not content */ 
+    font-size: 1.4rem; 
     font-weight: 800;
     color: var(--burgundy);
     border: none;
     background: transparent;
-    padding: 0;        /* Remove vertical padding to align perfectly */
+    padding: 0;
     cursor: pointer;
-    text-align: left;  /* Force left alignment so it sits next to the icon */
-    width: auto;       /* Stop it from greedily taking space if not needed */
+    text-align: left;
+    white-space: nowrap;
+    text-overflow: ellipsis; 
+    overflow: hidden;
 }
 
         .profile-dropdown {
@@ -678,21 +682,46 @@ function apiCall(action, params, isPost = false) {
     }
 
     
-    function createNewSheet() {
-        const name = prompt("New Event Name:");
-        if(!name) return;
+function createNewSheet() {
+    const name = prompt("New Event Name:");
+    if (!name) return;
+    
+    // 1. Immediate UI Feedback
+    const sel = document.getElementById('sheetSelector');
+    const originalText = sel.options[sel.selectedIndex].text;
+    
+    // Show "Creating..." in the dropdown temporarily
+    let tempOpt = document.createElement('option');
+    tempOpt.text = "Creating " + name + "...";
+    sel.add(tempOpt);
+    sel.selectedIndex = sel.options.length - 1;
+    sel.disabled = true; // Lock it
+
+    apiCall("createSheet", { newSheetName: name }, true)
+    .then(data => {
+        if (data.error) { 
+            alert(data.error); 
+            // Revert UI
+            sel.remove(sel.options.length - 1); // Remove temp option
+            sel.disabled = false;
+            return; 
+        }
         
-        apiCall("createSheet", {newSheetName: name}, true)
-        .then(data => {
-            if(data.error) { alert(data.error); return; }
-            
-            // Success: Wait a tick, then reload list
-            setTimeout(() => { 
-                fetchSheets(); 
-                // Optional: Alert or Auto-select could be added here
-            }, 1500);
-        });
-    }
+        // 2. Success: Set Intent
+        localStorage.setItem('lastSheetId', data.sheetId);
+        
+        // 3. Refresh Immediately (No arbitrary sleep needed)
+        fetchSheets(); 
+        
+        // (fetchSheets will unlock the dropdown when it renders)
+        sel.disabled = false;
+    })
+    .catch(e => {
+        alert("Error: " + e);
+        sel.disabled = false;
+    });
+}
+
 
 
     function loadSheetData() {
@@ -712,25 +741,35 @@ function apiCall(action, params, isPost = false) {
                 return;
             }
             localData = d.rows || []; 
-// SHOW DELETE BUTTON ONLY IF EMPTY ---
-const delBtn = document.getElementById('btnDelSheet');
-if (delBtn) {
-    // Show ONLY if localData is empty (0 rows)
-    if (localData.length === 0) {
-        delBtn.classList.remove('hidden');
-    } else {
-        delBtn.classList.add('hidden');
-    }
-    
-    // Safety: Also hide if it's the ONLY sheet (count check from dropdown)
-    const sel = document.getElementById('sheetSelector');
-    if (sel && sel.options.length <= 1) {
-        delBtn.classList.add('hidden');
-    }
-}
-            resetForm(); 
+            
+            // --- UI: Update Delete Sheet Button ---
+            const delBtn = document.getElementById('btnDelSheet');
+            if (delBtn) {
+                const sel = document.getElementById('sheetSelector');
+                if (localData.length === 0 && sel && sel.options.length > 1) {
+                    delBtn.classList.remove('hidden');
+                } else {
+                    delBtn.classList.add('hidden');
+                }
+            }
+            
+            // --- LOGIC: Restore Position vs Reset ---
+            // THIS IS THE MISSING PART:
+            const savedIndex = localStorage.getItem('restoreIndex');
+            
+            if (savedIndex !== null && localData.length > 0) {
+                let idx = parseInt(savedIndex, 10);
+                if (idx >= localData.length) idx = localData.length - 1;
+                if (idx < 0) idx = 0;
+                
+                loadRecord(idx);
+                localStorage.removeItem('restoreIndex'); // Clean up
+            } else {
+                resetForm(); // Only reset if no restore intent exists
+            }
         });
     }
+
 
 
     function nav(dir) {
@@ -828,10 +867,35 @@ if (delBtn) {
     
 function deleteRecord() {
     if(!isUpdating || !confirm("Delete?")) return;
+
+    const btn = document.querySelector('.btn-trash'); // Get trash button to disable it
+    if(btn) btn.disabled = true; // Prevent double-clicks
+
+    // 1. Calculate where we want to land
+    // If we are at index 5, we want to land at 4.
+    // If we are at index 0, land at 0.
+    let targetIndex = Math.max(0, currentIndex - 1);
+    
+    // 2. Set the flag explicitly in localStorage
+    localStorage.setItem('restoreIndex', targetIndex);
+
+    // 3. Call Server
     apiCall("delete", { 
         rowIndex: localData[currentIndex].rowIndex, 
         sheetName: document.getElementById('sheetSelector').value 
-    }, true).then(() => { loadSheetData(); });
+    }, true)
+    .then(() => {
+        // 4. Server confirmed delete. NOW reload data.
+        // The server definitely has the row removed now.
+        loadSheetData(); 
+    })
+    .catch(e => {
+        alert("Delete failed: " + e);
+        if(btn) btn.disabled = false;
+    })
+    .finally(() => {
+        if(btn) btn.disabled = false;
+    });
 }
 
     function buildReportHtml(note, score, breakdown, date, profile) {
@@ -1029,15 +1093,26 @@ function scaleSheetFont() {
     const sel = document.getElementById('sheetSelector');
     if (!sel || sel.selectedIndex < 0) return;
     
+    // Get the text of the CURRENTLY selected option
     const text = sel.options[sel.selectedIndex].text;
     const len = text.length;
     
-    // Dynamic Scaling Logic
-    // Base: 1.4rem. If len > 15 chars, start shrinking. Min: 0.9rem
-    let newSize = 1.4; 
-    if (len > 15) newSize = Math.max(0.9, 1.4 - ((len - 15) * 0.03));
+    // Reset to base size first to avoid "stuck" states
+    sel.style.fontSize = "1.4rem"; 
     
-    sel.style.fontSize = newSize + "rem";
+    // Scaling Logic:
+    // < 12 chars: 1.4rem (Big)
+    // > 25 chars: 0.9rem (Small)
+    // In between: Linear interpolation
+    if (len > 12) {
+        // Calculate reduction: 0.04rem per extra char
+        let newSize = 1.4 - ((len - 12) * 0.04);
+        
+        // Cap the minimum size at 0.9rem
+        newSize = Math.max(0.9, newSize);
+        
+        sel.style.fontSize = newSize + "rem";
+    }
 }
 
 
