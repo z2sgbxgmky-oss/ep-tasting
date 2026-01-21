@@ -436,13 +436,21 @@ input[type=range]:active + .custom-thumb {
     transform: translate(-50%, -50%) scale(1.3);
 }
 
-/* Hit the Target! */
+/* Make it pop when active (optional) */
+input[type=range]:active + .custom-thumb.match-pulse {
+    box-shadow: 0 0 0 4px rgba(128, 0, 32, 0.3); /* Ring effect */
+    transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy spring effect */
+    z-index: 20; /* Ensure it pops over everything */
+    transform: translate(-50%, -50%) scale(1.5);
+}
+
+/* Hit the Target! 
 .custom-thumb.match-pulse {
     box-shadow: 0 0 0 4px rgba(128, 0, 32, 0.3); /* Ring effect */
     transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy spring effect */
     z-index: 20; /* Ensure it pops over everything */
 }
-
+*/
 
     </style>
 </head>
@@ -500,7 +508,7 @@ input[type=range]:active + .custom-thumb {
     <div style="position: absolute; left: 0; right: 0; height: 2px; background: #edf2f7; border-radius: 1px; z-index: 1;"></div>
 
     <!-- 2. The Input (Invisible Logic Layer) -->
-    <input type="range" id="baseScoreSlider" min="50" max="100" step="1" 
+    <input type="range" id="baseScoreSlider" min="75" max="100" step="1" 
            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10; margin: 0; -webkit-tap-highlight-color: transparent;"
            oninput="updateSliderVisuals(this.value)">
 
