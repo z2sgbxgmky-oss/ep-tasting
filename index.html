@@ -327,79 +327,102 @@
 
 /* --- STEALTH SLIDER STYLES --- */
 
-/* Remove default styling */
+/* 1. The Real Input (Invisible but "Touchable") */
 input[type=range]#baseScoreSlider {
     -webkit-appearance: none;
     width: 100%;
-    margin: 4px 0 0 0; /* Space from text */
+    margin: 4px 0 0 0;
     background: transparent;
     cursor: pointer;
-    height: 12px; /* Touch target height */
+    
+    /* CRITICAL: Make the "hit area" tall enough for fingers */
+    height: 30px; 
+    
+    /* CRITICAL: Ensure it sits ON TOP of the visual track/thumb */
+    position: relative;
+    z-index: 2; 
+    
     display: block;
+    opacity: 0; /* Keeps it invisible, but it still captures touch */
 }
 
-/* The Track (The "Line") */
-input[type=range]#baseScoreSlider::-webkit-slider-runnable-track {
-    width: 100%;
-    height: 2px; /* Looks like an underline */
-    background: #edf2f7; /* Grey inactive part */
-    border-radius: 1px;
-    border: none;
+/* 2. The Visual Track (Sits behind input) */
+/* We need a container or pseudo-element for the track if the input is invisible/opacity:0.
+   However, your current setup relies on the input having opacity but styling its track? 
+   No, standard browser behavior hides the track if opacity is 0. 
+   
+   BETTER APPROACH FOR "STEALTH" SLIDER:
+   Keep the input VISIBLE but style the track/thumb to match your design perfectly,
+   OR keep the input invisible (opacity:0) and have a SEPARATE visual track div behind it.
+   
+   Given your current code structure, let's stick to the "Pointer Events" fix which is safest.
+*/
+
+/* REVERTING to your structure but fixing the stacking context */
+
+/* Container for the slider area to hold everything together */
+.slider-container-wrapper {
+    position: relative;
+    height: 30px; /* Tall enough for touch */
+    display: flex;
+    align-items: center;
 }
-input[type=range]#baseScoreSlider::-moz-range-track {
+
+/* The Real Input - We make it INVISIBLE but sit ON TOP */
+input[type=range]#baseScoreSlider {
+    -webkit-appearance: none;
+    position: absolute; /* Take it out of flow to stack it */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%; /* Full height of container */
+    opacity: 0;   /* Completely invisible */
+    z-index: 10;  /* Topmost layer - receives all clicks/touches */
+    margin: 0;
+    cursor: pointer;
+}
+
+/* The Visual Track - Needs to be a separate div now since input is invisible */
+/* Add this HTML element behind your input: <div class="visual-track"></div> */
+.visual-track {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
     width: 100%;
     height: 2px;
     background: #edf2f7;
     border-radius: 1px;
-    border: none;
+    z-index: 1; /* Below input */
 }
 
-/* The Thumb (The "Burgundy Ball") */
-input[type=range]#baseScoreSlider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    height: 10px;
-    width: 10px;
-    border-radius: 50%;
-    background: var(--burgundy);
-    margin-top: -4px; /* Center on the 2px line: (10 - 2) / -2 */
-    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-    transition: transform 0.1s;
-}
-input[type=range]#baseScoreSlider:active::-webkit-slider-thumb {
-    transform: scale(1.3);
-}
-input[type=range]#baseScoreSlider::-moz-range-thumb {
-    height: 10px;
-    width: 10px;
-    border: none;
-    border-radius: 50%;
-    background: var(--burgundy);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-}
-
-/* Custom Thumb Style (Burgundy Ball) */
+/* The Visual Thumb (Your Burgundy Ball) */
 .custom-thumb {
     position: absolute;
     top: 50%;
-    left: 0%; 
-    /* Reduced Size (~30% smaller) */
-    width: 50px;  
-    height: 50px;
+    /* 'left' is set by JS */
+    
+    width: 25px;  
+    height: 25px;
     background: #4a5568;
     color: white;
     border-radius: 50%;
-    /* Smaller Font */
     font-size: 0.7rem; 
     font-weight: 700;
     display: flex;
     justify-content: center;
     align-items: center;
+    
     transform: translate(-50%, -50%);
-    pointer-events: none; 
-    z-index: 1;
     box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-    transition: transform 0.1s, background-color 0.2s, color 0.2s; /* Added color transitions */
+    
+    /* CRITICAL FIX: Ignore touches so they hit the input[type=range] instead */
+    pointer-events: none; 
+    
+    z-index: 5; /* Above track, below input */
+    transition: transform 0.1s, background-color 0.2s;
 }
+
 
 /* DISABLED STATE (During Loading) */
 .custom-thumb.disabled {
@@ -408,11 +431,11 @@ input[type=range]#baseScoreSlider::-moz-range-thumb {
     box-shadow: none;      /* Removes pop/shadow */
 }
 
-/* Make it pop when active (optional) 
+/* Make it pop when active (optional) */
 input[type=range]:active + .custom-thumb {
     transform: translate(-50%, -50%) scale(1.3);
 }
-*/
+
 
 
     </style>
@@ -466,18 +489,19 @@ input[type=range]:active + .custom-thumb {
     </div>
 
     <!-- SLIDER CONTAINER -->
-    <div style="position: relative; height: 16px; margin-top: 2px;">
-        <!-- 1. The Track -->
-        <div style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: #edf2f7; transform: translateY(-50%); z-index: 0;"></div>
+<div style="position: relative; height: 40px; margin-top: 2px; display: flex; align-items: center;">
+    <!-- 1. The Track (Visual only) -->
+    <div style="position: absolute; left: 0; right: 0; height: 2px; background: #edf2f7; border-radius: 1px; z-index: 1;"></div>
 
-        <!-- 2. The Input -->
-        <input type="range" id="baseScoreSlider" min="50" max="100" step="1" 
-               style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2; margin: 0;"
-               oninput="updateSliderVisuals(this.value)">
+    <!-- 2. The Input (Invisible Logic Layer) -->
+    <input type="range" id="baseScoreSlider" min="50" max="100" step="1" 
+           style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10; margin: 0; -webkit-tap-highlight-color: transparent;"
+           oninput="updateSliderVisuals(this.value)">
 
-        <!-- 3. The Custom Thumb -->
-        <div id="sliderThumb" class="custom-thumb">88</div>
-    </div>
+    <!-- 3. The Custom Thumb (Visual only) -->
+    <div id="sliderThumb" class="custom-thumb" style="pointer-events: none;">88</div>
+</div>
+
 </div>
 
 
