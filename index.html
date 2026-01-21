@@ -3,16 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Spit Circuit -- rapid wine tasting app</title>
+    <title>Wine Tasting Assistant</title>
     <style>
-        :root {
-            --bg-color: #f8f9fa;
-            --card-bg: #ffffff;
-            --burgundy: #800020;
-            --flaw-bg: #fff5f5; --flaw-border:  #fff5f5; /* #fc8181; */ --flaw-text: #c53030;
-            --trait-bg: #ebf8ff; --trait-border: #ebf8ff; /* #63b3ed; */ --trait-text: #2b6cb0;
-            --pro-bg: #f0fff4; --pro-border: #f0fff4; /* #68d391; */ --pro-text: #2f855a;
-        }
+
+:root {
+    --bg-color: #f8f9fa;
+    --card-bg: #ffffff;
+    --burgundy: #800020;
+    
+    /* FLAWS: Richer Blush (was #fff5f5) */
+    --flaw-bg: #fed7d7; 
+    --flaw-border: #fed7d7; /* Keep same as BG */
+    --flaw-text: #9b2c2c;   /* Darker text for contrast on darker BG */
+
+    /* TRAITS: Richer Sky Blue (was #ebf8ff) */
+    --trait-bg: #bee3f8; 
+    --trait-border: #bee3f8; 
+    --trait-text: #2c5282;
+
+    /* PROS: Richer Mint (was #f0fff4) */
+    --pro-bg: #c6f6d5; 
+    --pro-border: #c6f6d5; 
+    --pro-text: #276749;
+}
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -34,9 +47,9 @@
         }
 
         header {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             border-bottom: none;
-            padding-bottom: 10px;
+            padding-bottom: 5px;
         }
 
 .header-row { 
@@ -310,6 +323,97 @@
         .btn-save.update { background: #2f855a; } 
         .btn-trash { color: #c53030; font-size: 1.3rem; }
 
+
+/* --- STEALTH SLIDER STYLES --- */
+
+/* Remove default styling */
+input[type=range]#baseScoreSlider {
+    -webkit-appearance: none;
+    width: 100%;
+    margin: 4px 0 0 0; /* Space from text */
+    background: transparent;
+    cursor: pointer;
+    height: 12px; /* Touch target height */
+    display: block;
+}
+
+/* The Track (The "Line") */
+input[type=range]#baseScoreSlider::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 2px; /* Looks like an underline */
+    background: #edf2f7; /* Grey inactive part */
+    border-radius: 1px;
+    border: none;
+}
+input[type=range]#baseScoreSlider::-moz-range-track {
+    width: 100%;
+    height: 2px;
+    background: #edf2f7;
+    border-radius: 1px;
+    border: none;
+}
+
+/* The Thumb (The "Burgundy Ball") */
+input[type=range]#baseScoreSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    background: var(--burgundy);
+    margin-top: -4px; /* Center on the 2px line: (10 - 2) / -2 */
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    transition: transform 0.1s;
+}
+input[type=range]#baseScoreSlider:active::-webkit-slider-thumb {
+    transform: scale(1.3);
+}
+input[type=range]#baseScoreSlider::-moz-range-thumb {
+    height: 10px;
+    width: 10px;
+    border: none;
+    border-radius: 50%;
+    background: var(--burgundy);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* Custom Thumb Style (Burgundy Ball) */
+.custom-thumb {
+    position: absolute;
+    top: 50%;
+    left: 0%; 
+    /* Reduced Size (~30% smaller) */
+    width: 23px;  
+    height: 23px;
+    background: #4a5568;
+    color: white;
+    border-radius: 50%;
+    /* Smaller Font */
+    font-size: 0.7rem; 
+    font-weight: 700;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translate(-50%, -50%);
+    pointer-events: none; 
+    z-index: 1;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    transition: transform 0.1s, background-color 0.2s, color 0.2s; /* Added color transitions */
+}
+
+/* DISABLED STATE (During Loading) */
+.custom-thumb.disabled {
+    background: #edf2f7; /* Matches the line color (Grey) */
+    color: transparent;    /* Hides the number */
+    box-shadow: none;      /* Removes pop/shadow */
+}
+
+/* Make it pop when active (optional) */
+input[type=range]:active + .custom-thumb {
+    transform: translate(-50%, -50%) scale(1.3);
+}
+
+
+
     </style>
 </head>
 <body>
@@ -349,12 +453,34 @@
             <div id="aiNoteText">Generating...</div>
         </div>
 
-        <div class="header-row" style="margin-top:25px; margin-bottom: 0px; border-bottom: 2px solid #edf2f7; padding-bottom: 5px;">
-            <select id="profileSelector" class="profile-dropdown" onchange="handleProfileChange()">
-                <option>Loading Profiles...</option>
-            </select>
-            <button class="btn-add-profile" onclick="openProfileDesigner()">+</button>
-        </div>
+
+<div class="header-row" style="flex-direction: column; align-items: stretch; gap: 0; margin-top: 30px; margin-bottom: 0px; padding-bottom: 0; border-bottom: none; position: relative;">
+    
+    <!-- Profile Selector -->
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0;">
+        <select id="profileSelector" class="profile-dropdown" onchange="handleProfileChange()" style="flex-grow: 1; padding: 5px 0;">
+            <option>Loading Profiles...</option>
+        </select>
+        <button class="btn-add-profile" onclick="openProfileDesigner()">+</button>
+    </div>
+
+    <!-- SLIDER CONTAINER -->
+    <div style="position: relative; height: 16px; margin-top: 2px;">
+        <!-- 1. The Track -->
+        <div style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: #edf2f7; transform: translateY(-50%); z-index: 0;"></div>
+
+        <!-- 2. The Input -->
+        <input type="range" id="baseScoreSlider" min="50" max="100" step="1" 
+               style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2; margin: 0;"
+               oninput="updateSliderVisuals(this.value)">
+
+        <!-- 3. The Custom Thumb -->
+        <div id="sliderThumb" class="custom-thumb">88</div>
+    </div>
+</div>
+
+
+
         
     </header>
 
@@ -441,7 +567,7 @@
 // --- API WRAPPER (Self-Auth) ---
 let CURRENT_USER = localStorage.getItem('wta_user_id');
 if (!CURRENT_USER) {
-    CURRENT_USER = prompt("Welcome to Spit Circut - rapid wine tasting app!\nEnter your name:");
+    CURRENT_USER = prompt("Enter your email/ID:");
     if(CURRENT_USER) localStorage.setItem('wta_user_id', CURRENT_USER);
     else CURRENT_USER = "demo_user";
 }
@@ -508,6 +634,10 @@ function apiCall(action, params, isPost = false) {
         if(!name) return;
 
         // Visual Feedback
+        const sliderInput = document.getElementById('baseScoreSlider');
+        const sliderThumb = document.getElementById('sliderThumb');
+        if (sliderInput) sliderInput.disabled = true;
+        if (sliderThumb) sliderThumb.classList.add('disabled'); // Turns grey, hides text
         document.querySelectorAll('.grid-3').forEach(el => el.style.opacity = '0.4');
 
         apiCall("getProfile", {name: name})
@@ -518,11 +648,25 @@ function apiCall(action, params, isPost = false) {
                 populateCheckboxes(localData[currentIndex]);
             }
             document.querySelectorAll('.grid-3').forEach(el => el.style.opacity = '1');
+            if (sliderInput) sliderInput.disabled = false;
+            if (sliderThumb) sliderThumb.classList.remove('disabled'); // Turns burgundy, shows text
         });
     }
 
      function renderProfileForm(config) {
         if(!config || !config.nose) return;
+
+
+    if (config.scoring && config.scoring.baseScore) {
+        const val = config.scoring.baseScore;
+        const slider = document.getElementById('baseScoreSlider');
+        
+        // Update Input Value
+        slider.value = val;
+        
+        // Update Visuals (Move ball + Set Text)
+        updateSliderVisuals(val);
+    }
 
         // 1. Standard Checkbox Helper (for Nose/Palate/Finish)
         const mkCheck = (group, name) => `<label><input type="checkbox" name="${group}" value="${name}"> ${name}</label>`;
@@ -831,6 +975,7 @@ function createNewSheet() {
             rowIndex: isUpdating ? localData[currentIndex].rowIndex : null,
             sheetName: document.getElementById('sheetSelector').value,
             profileName: document.getElementById('profileSelector').value, // This sends the CURRENT dropdown value
+            baseScore: document.getElementById('baseScoreSlider').value,
             ref: ref,
             nose_flaws: getChecked('nose_flaws'), nose_traits: getChecked('nose_traits'), nose_pros: getChecked('nose_pros'),
             palate_flaws: getChecked('palate_flaws'), palate_traits: getChecked('palate_traits'), palate_pros: getChecked('palate_pros'),
@@ -915,7 +1060,7 @@ function deleteRecord() {
                 <span style="font-weight:normal; color:#555; margin-left:6px;">${date||""}</span>
             </div>
             <div style="font-size:0.9em; line-height:1.8;">${badgeHtml}</div>
-            <div style="font-size:9px; color:#ccc; margin-top:12px; text-transform:uppercase; letter-spacing:0.5px;">Assessment Profile: ${profile||"Unknown"}</div>
+            <div style="font-size:9px; color:#ccc; margin-top:12px; text-transform:uppercase; letter-spacing:0.5px;">Profile: ${profile||"Unknown"}</div>
         </div>`;
     }
 
@@ -1112,6 +1257,19 @@ function scaleSheetFont() {
         newSize = Math.max(0.9, newSize);
         
         sel.style.fontSize = newSize + "rem";
+    }
+}
+
+function updateSliderVisuals(val) {
+    const min = 50;
+    const max = 100;
+    const percentage = ((val - min) / (max - min)) * 100;
+    
+    // Update the visual ball position
+    const thumb = document.getElementById('sliderThumb');
+    if(thumb) {
+        thumb.style.left = percentage + "%";
+        thumb.innerText = val; // Put text INSIDE the ball
     }
 }
 
