@@ -31,7 +31,7 @@
             max-width: 900px;
             background: var(--card-bg);
             padding: 20px;
-            border-radius: 12px;
+            border-radius: 12px;f
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             padding-bottom: 90px;
             box-sizing: border-box;
@@ -265,16 +265,29 @@
             <div class="logic-title">True To: Typicity & Origins</div>
             
             <div class="logic-card" style="font-size:0.8rem; color:#718096; margin-bottom:15px; background:#f0fff4; border-color:#c6f6d5; color:#276749;">
-               This acts as a <em>Bonus</em> for base wines (rewarding character) and a <em>Malus</em> for great wines (punishing inauthenticity).
+               This acts as a <em>Bonus</em> for entry-level wines (rewarding character) and a <em>Malus</em> for great wines (punishing inauthenticity).
                 <ul style="margin:5px 0 0 0; padding-left:20px;">
-                    <li><strong>Base Wine</strong> (base score and less): Can earn the full Bonus for being true, but receive zero Malus for lacking it.</li>
-                    <li><strong>Average Wine</strong> (midway score): Receives 50% of the potential Bonus and 50% of the potential Penalty.</li>
-                    <li><strong>Perfect Wines</strong> (100 points): Earns zero Bonus (truth is expected), but gets the full Penalty if lacks authenticity.</li>
-                </ul>
             </div>
 
+
+    <!-- 0. NEW: Universal Quality Floor (The Pivot Point) -->
+    <div class="sub-header">Entry Wines Threshold</div>
+    <div class="logic-card" style="margin-bottom:20px;">
+        <div class="slider-row">
+            <div class="slider-header">
+                <span>Max score of Entry-Level wines</span>
+                <span id="lbl_tt_floor" class="slider-val">85</span>
+            </div>
+            <!-- Range: 50 to 95. Default 85. -->
+            <input type="range" id="sl_tt_floor" min="50" max="95" step="1" value="85" oninput="updateTTFloor(this.value)">
+            <div style="font-size:0.75rem; color:#718096; margin-top:8px;">
+                Wines with this score and below are treated as 'entry-level' with naturally zero expectations of showing its origins.
+            </div>
+        </div>
+    </div>
+
             <!-- 1. Global Impact Slider -->
-            <div class="sub-header">MAXIMUM IMPACT (SWING)</div>
+            <div class="sub-header">MAXIMUM IMPACT</div>
             <div class="logic-card" style="margin-bottom:20px;">
                  <div class="slider-row">
                     <div class="slider-header">
@@ -356,8 +369,8 @@
             <h4 style="margin:15px 0 5px 0; color:#2d3748;">5. Fidelity to Origins (Sliding Scale)</h4>
             <p style="margin:0;">This is a swinging bonus/malus parameter:</p>
             <ul style="padding-left:20px; margin:5px 0;">
-                <li>A simple wine that clearly shows its roots receives maximum bonus. Following a sliding scale, this bonus decreases as wine quality rises, eventually reaching zero for perfect wines.</li>
-                <li>Malus goes goes to the opposite direction: a 100 point wine that fails to be true to origins receives maximum malus. The penalty then decreases on a sliding scale reaching zero for wines at the 'base score' and below.</li>
+                <li>An entry-level wine that clearly shows its roots receives maximum bonus. Following a sliding scale, this bonus decreases as wine quality rises, eventually reaching zero for perfect wines.</li>
+                <li>Malus goes to the opposite direction: a 100 point wine that fails to be true to origins receives maximum malus. The penalty then decreases on a sliding scale reaching zero for entry-level wines.</li>
             </ul>
         </div>
         
@@ -398,7 +411,6 @@
         </div>
     </div>
 </div>
-
 
 
 
@@ -532,6 +544,8 @@ function apiCall(action, params, isPost = false) {
         // 1. Core Logic
         document.getElementById('sl_base').value = config.scoring.baseScore || 88;
         updateBase(config.scoring.baseScore || 88);
+
+
 // Scale factor: 100% -> ~15 on slider
 const scale = 15; 
 document.getElementById('sl_nose').value = Math.round(config.scoring.sectionWeights.nose);
@@ -621,6 +635,15 @@ updateWeights();
         } else {
              cTrueTo.innerHTML = "<div style='font-style:italic; color:#a0aec0; padding:10px;'>No 'True To' items defined in Step 1.</div>";
         }
+
+	// C. Floor
+    var savedFloor = (config.scoring.trueToFloor !== undefined) ? config.scoring.trueToFloor : 85;
+    
+    var sliderEl = document.getElementById('sl_tt_floor');
+    if(sliderEl) {
+        sliderEl.value = savedFloor;
+        updateTTFloor(savedFloor);
+    }
 
         // 6. AI
         document.getElementById('ai_style').value = config.ai.criticStyle || "Classic British";
@@ -732,6 +755,14 @@ window.updateItemScore = function(label, val, isPro) {
         if(!config.scoring) config.scoring = {};
         config.scoring.trueToImpactPct = parseFloat(val); // We keep the variable name to avoid schema errors, but it stores POINTS now.
     }
+
+
+window.updateTTFloor = function(val) {
+    document.getElementById('lbl_tt_floor').innerText = val;
+    if(!config.scoring) config.scoring = {};
+    // Ensure we parse it as a number so math works later
+    config.scoring.trueToFloor = parseInt(val);
+}
 
 
 
