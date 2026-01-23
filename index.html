@@ -402,18 +402,20 @@ input[type=range]#baseScoreSlider {
     position: absolute;
     top: 50%;
     /* 'left' is set by JS */
-    
-    width: 30px;  
+    width: auto;  
     height: 30px;
     background: #edf2f7;
+    padding: 0 10px;  
     color: #4a5568; 
     border-radius: 50%;
-    font-size: 0.7rem; 
-    font-weight: 700;
+    font-size: 0.8rem; 
+    font-weight: 400;
     display: flex;
     justify-content: center;
+    border-radius: 14px;
     align-items: center;   
     transform: translate(-50%, -50%);
+    white-space: nowrap;   /* Keep text on one line */
     pointer-events: none;     
     z-index: 5; /* Above track, below input */
     transition: transform 0.1s, background-color 0.2s;
@@ -440,13 +442,12 @@ input[type=range]:active + .custom-thumb.match-pulse {
     transform: translate(-50%, -50%) scale(1.5);
 }
 
-/* Hit the Target! 
+
+/* Hit the Target! */
 .custom-thumb.match-pulse {
-    box-shadow: 0 0 0 4px rgba(128, 0, 32, 0.3); /* Ring effect */
-    transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy spring effect */
+    box-shadow: 0 0 0 2px rgba(128, 0, 32, 0.2); /* Ring effect */
     z-index: 20; /* Ensure it pops over everything */
 }
-*/
 
     </style>
 </head>
@@ -1003,6 +1004,25 @@ function createNewSheet() {
     function submitData() {
         const ref = document.getElementById('wineRef').value;
         if(!ref) { alert("Enter Wine Name"); return; }
+
+    const userBenchmark = parseFloat(document.getElementById('baseScoreSlider').value);
+    const profileDefault = currentProfileBaseScore || 88; // Ensure this global is set in renderProfileForm
+    
+    // Count total Pros checked across all sections
+    const prosCount = getChecked('nose_pros').length + 
+                      getChecked('palate_pros').length + 
+                      getChecked('finish_pros').length;
+
+    // --- BLIND SPOT RULE (BLOCKING) ---
+    // Condition: User raised the bar (> Default) but found NO Positive Traits.
+    // Result: We cannot determine if the wine is 88, 89... or 94. 
+    // It creates an undefined score range.
+    if (userBenchmark > profileDefault && prosCount === 0) {
+ alert(`⚠️ Ambiguous Data (Blocking)\n\nYou raised the Par to ${userBenchmark} but found zero Pros.\n\nThe system cannot score this wine because we don't know "how far below" expectation it is.\n\n👉 Please LOWER the Par until you can identify positive traits or all the way down to ${profileDefault}.`);
+        return; // STOP. Do not proceed to API.
+    }
+
+
         if (isUpdating && !confirm("Overwrite data?")) return;
 
         const btn = document.getElementById('saveBtn');
@@ -1310,7 +1330,7 @@ function scaleSheetFont() {
         const thumb = document.getElementById('sliderThumb');
         if(thumb) {
             thumb.style.left = percentage + "%";
-            thumb.innerText = val;
+            thumb.innerHTML = `Par:&nbsp;<b>${val}</b>`; 
             
             // CHECK FOR MATCH
             // We use a small epsilon for float comparison just in case, but strict equality is usually fine for slider steps
